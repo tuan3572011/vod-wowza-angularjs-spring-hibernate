@@ -23,6 +23,13 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 public class DataUploadUtility {
+	private static final String VIDEO_DIR_IN_EC2 = "/usr/local/WowzaStreamingEngine/content";
+	private static final String HOME_DIR_IN_EC2 = "/home/ec2-user/";
+	private static final String KEY_DIR_IN_EC2 = "/usr/local/WowzaStreamingEngine/keys/";
+	private static final String GEN_KEY_FILE = "genkeyWowzaCommand.sh";
+	private static final String XML_HEADER = "\'<?xml version=\"1.0\" encoding=\"UTF-8\"?>\'";
+	private static final String BITRATE_720 = "13500000";
+	private static final String BITRATE_480 = "850000";
 
 	public static boolean uploadVideoToWowza(Session session, String videoName,
 			InputStream videoInputStream, InputStream keyInputStream) {
@@ -30,12 +37,11 @@ public class DataUploadUtility {
 
 		try {
 			// transfer data
-			final String UPLOAD_FILE_TO = "/usr/local/WowzaStreamingEngine/content";
 			File localFile = fromStream2File(videoInputStream, "rrr", ".mp4");
 			byte[] buffer = new byte[1500000];
 			System.out.println("begin transfer data scp " + videoName);
 			isTransferOk = transferDataToEc2UsingScp(session, localFile,
-					videoName, UPLOAD_FILE_TO, buffer);
+					videoName, VIDEO_DIR_IN_EC2, buffer);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -59,9 +65,9 @@ public class DataUploadUtility {
 			// upload key
 			String fileUpLoadPath = ResourcesFolderUtility
 					.getPathFromResourceFolder(UploadController.class,
-							"genkeyWowzaCommand.sh");
+							GEN_KEY_FILE);
 			File localFile = new File(fileUpLoadPath);
-			String pathToSaveInServer = "/home/ec2-user/";
+			String pathToSaveInServer = HOME_DIR_IN_EC2;
 			boolean isTranferGenKeyCommandFileOk = transferDataToEc2UsingScp(
 					session, localFile, localFile.getName(),
 					pathToSaveInServer, new byte[500]);
@@ -77,13 +83,12 @@ public class DataUploadUtility {
 
 				create480pVideoInEC2(session, videoName);
 				createKeyFileFor480pVideoInEC2(session, videoName);
-
+				createSmilFileForVideo(session, videoName);
 				// read key of this video
 				ChannelSftp sftpChannel = (ChannelSftp) session
 						.openChannel("sftp");
 				sftpChannel.connect();
-				String keyLocation = "/usr/local/WowzaStreamingEngine/keys/"
-						+ videoName + ".key";
+				String keyLocation = KEY_DIR_IN_EC2 + videoName + ".key";
 				System.out.println(keyLocation);
 				InputStream inputStream = sftpChannel.get(keyLocation);
 				BufferedReader reader = new BufferedReader(
@@ -110,19 +115,43 @@ public class DataUploadUtility {
 		return "";
 	}
 
+	private static void generateKeyFileForVideoInEC2(Session session,
+			String videoName) throws JSchException, IOException {
+		Channel shellChannel = session.openChannel("shell");
+		StringBuilder command = new StringBuilder();
+		command.append("cd");
+		command.append(" ");
+		command.append(KEY_DIR_IN_EC2);
+		command.append("\n");
+
+		command.append("chmod 777");
+		command.append(" ");
+		command.append(GEN_KEY_FILE);
+		command.append("\n");
+		command.append("./");
+		command.append(GEN_KEY_FILE);
+		command.append(" ");
+		command.append(videoName);
+		command.append("\n");
+
+		executeAndCloseChannel(shellChannel, command.toString());
+	}
+
 	private static void create480pVideoInEC2(Session session, String videoName)
 			throws JSchException, IOException {
-		String extension = videoName.split(":")[1];
-		String nameWithoutExtension = videoName.split(":")[0];
+		String extension = videoName.split(".")[1];
+		String nameWithoutExtension = videoName.split(".")[0];
 		String newVideoName = nameWithoutExtension + "_480" + extension;
 		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
-		command.append("cd /usr/local/WowzaStreamingEngine/content");
+		command.append("cd");
+		command.append(" ");
+		command.append(VIDEO_DIR_IN_EC2);
 		command.append("\n");
 
 		command.append("ffmpeg -i ");
 		command.append(videoName);
-		command.append(" -vf scale=420:240  -b:v 50k ");
+		command.append(" -vf scale=854:480  -b:v 110k ");
 		command.append(newVideoName);
 		command.append("\n");
 
@@ -131,12 +160,15 @@ public class DataUploadUtility {
 
 	private static void createKeyFileFor480pVideoInEC2(Session session,
 			String videoName) throws JSchException, IOException {
-		String extension = videoName.split(":")[1];
-		String nameWithoutExtension = videoName.split(":")[0];
+		int indexOfDot = videoName.indexOf(".");
+		String nameWithoutExtension = videoName.substring(0, indexOfDot);
+		String extension = videoName.substring(indexOfDot);
 		String newVideoName = nameWithoutExtension + "_480" + extension;
 		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
-		command.append("cd /usr/local/WowzaStreamingEngine/keys");
+		command.append("cd");
+		command.append(" ");
+		command.append(KEY_DIR_IN_EC2);
 		command.append("\n");
 
 		command.append("cp");
@@ -151,15 +183,84 @@ public class DataUploadUtility {
 		executeAndCloseChannel(shellChannel, command.toString());
 	}
 
-	private static void generateKeyFileForVideoInEC2(Session session,
-			String videoName) throws JSchException, IOException {
+	private static void createSmilFileForVideo(Session session, String videoName)
+			throws JSchException, IOException {
+		int indexOfDot = videoName.indexOf(".");
+		String nameWithoutExtension = videoName.substring(0, indexOfDot);
+		String newName = nameWithoutExtension + ".smil";
 		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
-		command.append("cd /home/ec2-user/");
+		command.append("touch");
+		command.append(" ");
+		command.append(newName);
 		command.append("\n");
-		command.append("chmod 777 genkeyWowzaCommand.sh");
+
+		command.append("echo");
+		command.append(" ");
+		command.append(XML_HEADER);
+		command.append(">>");
+		command.append(newName);
 		command.append("\n");
-		command.append("./genkeyWowzaCommand.sh " + videoName);
+
+		command.append("echo \'<smil>\'");
+		command.append(">>");
+		command.append(newName);
+		command.append("\n");
+
+		command.append("echo \'<body>\'");
+		command.append(">>");
+		command.append(newName);
+		command.append("\n");
+
+		command.append("echo \'<switch>\'");
+		command.append(">>");
+		command.append(newName);
+		command.append("\n");
+
+		command.append("echo \'<video src=");
+		command.append("\"");
+		command.append(videoName);
+		command.append("\"");
+		command.append(" ");
+		command.append("system-bitrate=");
+		command.append("\"");
+		command.append(BITRATE_720);
+		command.append("\"");
+		command.append("/>");
+		command.append("\'");
+		command.append(">>");
+		command.append(newName);
+		command.append("\n");
+
+		command.append("echo \'<video src=");
+		command.append("\"");
+		command.append(nameWithoutExtension);
+		command.append("_480.mp4");
+		command.append("\"");
+		command.append(" ");
+		command.append("system-bitrate=");
+		command.append("\"");
+		command.append(BITRATE_480);
+		command.append("\"");
+		command.append("/>");
+		command.append("\'");
+		command.append(">>");
+		command.append(newName);
+		command.append("\n");
+
+		command.append("echo \'</switch>\'");
+		command.append(">>");
+		command.append(newName);
+		command.append("\n");
+
+		command.append("echo \'</body>\'");
+		command.append(">>");
+		command.append(newName);
+		command.append("\n");
+
+		command.append("echo \'</smil>\'");
+		command.append(">>");
+		command.append(newName);
 		command.append("\n");
 
 		executeAndCloseChannel(shellChannel, command.toString());
@@ -180,16 +281,26 @@ public class DataUploadUtility {
 		Channel channel = null;
 		try {
 			channel = ss.openChannel("exec");
-			String command = "scp -t " + pathToSaveInServer + "/" + videoName;
-			((ChannelExec) channel).setCommand(command);
+			StringBuilder command = new StringBuilder();
+			command.append("scp -t");
+			command.append(" ");
+			command.append(pathToSaveInServer);
+			command.append("/");
+			command.append(videoName);
+			((ChannelExec) channel).setCommand(command.toString());
 
 			// get I/O streams for remote scp
 			OutputStream out = channel.getOutputStream();
 			channel.connect();
 			long fileSize = localFile.length();
-			command = "C0644 " + fileSize + " " + videoName;
-			command += "\n";
-			out.write(command.getBytes());
+			command = new StringBuilder();
+			command.append("C0644");
+			command.append(" ");
+			command.append(fileSize);
+			command.append(" ");
+			command.append(videoName);
+			command.append("\n");
+			out.write(command.toString().getBytes());
 			out.flush();
 
 			// send a content of lfile
@@ -239,3 +350,4 @@ public class DataUploadUtility {
 
 	}
 }
+
