@@ -162,11 +162,11 @@
 		return false;
 	}
 	function addStarring() {
-		window.open('ThemDienVienController/layout');
+		window.open('DienVienController/layout');
 		return false;
 	}
 	function addDirector() {
-		window.open('ThemDaoDienController/layout');
+		window.open('DaoDienController/layout');
 		return false;
 	}
 	function uploadPhim() {

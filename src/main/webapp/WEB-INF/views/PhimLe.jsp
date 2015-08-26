@@ -10,13 +10,12 @@
 				<div class="row">
 					<div class="col-xs-12 col-sm-6 col-lg-3">
 						<div class="form-group">
-							<label><spring:message code="film.OrderBy" /></label> <select
-								class="form-control" name="orderBy" class="form-control">
-								<option><spring:message code="film.View" /></option>
-								<option><spring:message code="film.Rate" /></option>
-								<option><spring:message code="film.Comment" /></option>
-								<option selected="selected"><spring:message
-										code="film.All" /></option>
+							<label>Sap xep</label> <select class="form-control"
+								name="orderBy" class="form-control">
+								<option>View</option>
+								<option></option>
+								<option>Comment</option>
+								<option selected="selected">All</option>
 							</select>
 						</div>
 					</div>
@@ -24,34 +23,32 @@
 					<!--  Category -->
 					<div class="col-xs-12 col-sm-6 col-lg-3">
 						<div class="form-group">
-							<label><spring:message code="film.Category" /></label> <select
-								class="form-control" name="category">
+							<label>Category</label> <select class="form-control"
+								name="category">
 							</select>
 						</div>
 					</div>
 					<!--  Publish Date -->
 					<div class="col-xs-12 col-sm-6 col-lg-3">
 						<div class="form-group">
-							<label><spring:message code="film.PublishDate" /></label> <select
-								class="form-control" name="searchByYear">
+							<label>Nam phat hanh</label> <select class="form-control"
+								name="searchByYear">
 								<option value="2015">2015</option>
 								<option value="2014">2014</option>
 								<option value="2013">2013</option>
 								<option value="2012">2012</option>
 								<option value="2011">2011 về trước</option>
-								<option selected="selected"><spring:message
-										code="film.All" /></option>
+								<option selected="selected">All</option>
 							</select>
 						</div>
 					</div>
 					<!--  Country -->
 					<div class="col-xs-12 col-sm-6 col-lg-3">
 						<div class="form-group">
-							<label><spring:message code="film.Country" /></label> <select
-								class="form-control" name="country">
-								<option value="VN" <spring:message code="film.Country.VN" /> />
-								<option selected="selected"><spring:message
-										code="film.All" /></option>
+							<label>Country</label> <select class="form-control"
+								name="country">
+								<option value="VN">VN</option>
+								<option selected="selected">All</option>
 							</select>
 						</div>
 					</div>
@@ -68,13 +65,13 @@
 									style="margin-right: 80px">
 									<div class="thumbnail fix">
 										<div class="caption">
-											<header>${movie.engName} <br>
-											<span>${movie.vnName}</span>
+											<header>${movie.engName}
+												<br> <span>${movie.vnName}</span>
 											</header>
 											<footer>
-												<a href='${movie.trailer }'
-													data-toggle="lightbox" data-gallery="youtubevideos"
-													class="btn btn-success"> Trailer</a><a class="btn btn-info"
+												<a href='${movie.trailer }' data-toggle="lightbox"
+													data-gallery="youtubevideos" class="btn btn-success">
+													Trailer</a><a class="btn btn-info"
 													data-ng-click="ChiTiet('${movie.id }')">Chi tiết</a>
 											</footer>
 											<!-- /.modal-content -->

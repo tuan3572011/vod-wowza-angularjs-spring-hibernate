@@ -20,7 +20,7 @@ App
 						templateUrl : 'CaNhanController/layout',
 						controller : CaNhanController
 					});
-					
+
 					$routeProvider.when('/DangKy', {
 						templateUrl : 'RegisterUserController/layout',
 						controller : RegisterUserController
@@ -61,6 +61,11 @@ App
 					$routeProvider.when('/PlayVideo', {
 						templateUrl : 'PlayerAuthenticationController/layout',
 						controller : PlayerController
+					});
+
+					$routeProvider.when('/Starring', {
+						templateUrl : 'StarringController/',
+						controller : StarringController
 					});
 
 					$routeProvider.otherwise({
@@ -155,7 +160,7 @@ App.run(function($rootScope, $location, $cookieStore, $http) {
 				}
 			}
 			$rootScope.user = user;
-//			$rootScope.email = user.email;
+			// $rootScope.email = user.email;
 		});
 	}
 

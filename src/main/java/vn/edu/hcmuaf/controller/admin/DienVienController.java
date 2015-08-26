@@ -11,26 +11,24 @@ import org.springframework.web.client.RestTemplate;
 
 import vn.edu.hcmuaf.util.LinkService;
 
-import com.vod.model.Director;
+import com.vod.model.Starring;
 
 @Controller
-@RequestMapping(value = "/ThemDaoDienController")
-public class ThemDaoDienController {
+@RequestMapping(value = "/DienVienController")
+public class DienVienController {
 
 	@RequestMapping(value = "/layout")
-	public String getIndexPage(Model model) {
-		model.addAttribute("director", new Director());
-		System.out.println("Them dao dien controller");
-		return "ThemDaoDien";
-
+	public String addStarringLayout(Model model) {
+		model.addAttribute("starring", new Starring());
+		System.out.println("Them dien vien controller");
+		return "ThemDienVien";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
-	public String saveIndexPage(@ModelAttribute Director director, Model model) {
+	public String saveStarring(@ModelAttribute Starring starring, Model model) {
 		RestTemplate restTemplate = new RestTemplate();
 		ResponseEntity<Void> entity = restTemplate.postForEntity(
-				LinkService.DIRECTOR_ADD, director, Void.class);
-
+				LinkService.STAR_ADD, starring, Void.class);
 		boolean isSaveOk = true;
 		if (entity.getStatusCode().equals(HttpStatus.OK)) {
 			isSaveOk = true;
@@ -40,6 +38,11 @@ public class ThemDaoDienController {
 		if (isSaveOk) {
 			model.addAttribute("message", isSaveOk);
 		}
-		return "ThemDaoDien";
+		return "ThemDienVien";
+	}
+
+	@RequestMapping(value = "/detail", method = RequestMethod.GET)
+	public void detailStarring() {
+
 	}
 }

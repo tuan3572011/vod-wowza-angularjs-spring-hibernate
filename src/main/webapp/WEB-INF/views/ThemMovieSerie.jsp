@@ -15,7 +15,8 @@
 		<div class="col-xs-12 col-sm-6 col-lg-6">
 			<div class="form-group">
 				<div class="form-group">
-					<label for="engName">Tên tiếng Anh <font color="red">*</font></label> <input class="form-control form-fix"
+					<label for="engName">Tên tiếng Anh <font color="red">*</font></label>
+					<input class="form-control form-fix"
 						data-ng-model="serie.serie.engName" id="engName" name="engName"
 						required="required" />
 				</div>
@@ -53,15 +54,17 @@
 		<div class="col-xs-12 col-sm-6 col-lg-6">
 			<div class="form-group">
 				<label>Năm phát hành <font color="red">*</font></label> <input
-					class="form-control form-fix" data-ng-model="serie.serie.publishedYear"
-					name="publishedYear" required="required" />
+					class="form-control form-fix"
+					data-ng-model="serie.serie.publishedYear" name="publishedYear"
+					required="required" />
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-lg-6">
 			<div class="form-group">
 				<label>Tổng số tập <font color="red">*</font></label> <input
-					class="form-control form-fix" data-ng-model="serie.serie.numEpisodes"
-					name="numEpisodes" required="required" />
+					class="form-control form-fix"
+					data-ng-model="serie.serie.numEpisodes" name="numEpisodes"
+					required="required" />
 			</div>
 		</div>
 		<div class="col-xs-12 col-sm-6 col-lg-6">
@@ -155,11 +158,11 @@
 		return false;
 	}
 	function addStarring() {
-		window.open('ThemDienVienController/layout');
+		window.open('DienVienController/layout');
 		return false;
 	}
 	function addDirector() {
-		window.open('ThemDaoDienController/layout');
+		window.open('DaoDienController/layout');
 		return false;
 	}
 	function uploadTrailer() {

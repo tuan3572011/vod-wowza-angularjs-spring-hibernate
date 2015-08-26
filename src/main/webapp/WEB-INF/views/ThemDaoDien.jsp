@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Them dien vien</title>
+<title>Them dao dien</title>
 <link rel="stylesheet"
 	href="/hcmuaf/resources/MetroUIBootstrap/css/metro.css" />
 

@@ -66,24 +66,27 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 	};
 
 	// create function to show starrings when click next btn
-
-	var starring = [];
 	var currentStarringIndex = 0;
 	$scope.nextStarring = function() {
-		starring = [];
+		var starringsToShow = [];
 		if (currentStarringIndex >= allStarring.length) {
 			currentStarringIndex = 0;
 		}
 		var i = 0;
+		var currentStarring = {};
 		for (i = currentStarringIndex; i < currentStarringIndex + 5; i++) {
-			starring.push(allStarring[i]);
+			currentStarring = allStarring[i];
+			if (currentStarring == null) {
+				currentStarring = allStarring[i - allStarring.length];
+			}
+			starringsToShow.push(currentStarring);
 		}
 		currentStarringIndex += 5;
-		$scope.starrings = starring;
+		$scope.starrings = starringsToShow;
 	};
-	
+
 	// load relative movies
-	 $rootScope.allRelativeMovies = [];
+	$rootScope.allRelativeMovies = [];
 	var loadRelativeMovie = function(movieId) {
 		FilmUtilityService.loadRelativeMovie(movieId).success(function(data) {
 			$rootScope.allRelativeMovies = data;
@@ -113,7 +116,6 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 	};
 
 	// load hot movies
-	// $rootScope.allHotMovies = [];
 	var loadHotMovie = function(movie) {
 		FilmUtilityService.loadHotMovie().success(function(data) {
 			$rootScope.allHotMovies = data;
@@ -142,13 +144,12 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 		currentHotMoviesIndex += 5;
 		$scope.hotMovies = hotMovies;
 	};
-	
 
 	// go the the player page
 	$scope.playMovie = function(episode) {
 		FilmUtilityService.playMovie(episode).success(function() {
 			sessionStorage.setItem("source", "CamOnViTatCa.mp4");
-//			sessionStorage.setItem("source", episode.name);
+			// sessionStorage.setItem("source", episode.name);
 			// Distinguish between movie and episode in player controller
 			// if this is movie, movieType will be movie
 			// and remove serieId in sessionStorage
@@ -171,11 +172,10 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 				if (data == "OK") {
 					$scope.playMovie(episode);
 				} else {
-					alert("Khong the xem phim");
 					$scope.openRegisterDialog(episode);
 				}
-			}).error(function() {
-				alert("ERROR");
+			}).error(function(error) {
+				alert(error);
 			});
 		}
 	};

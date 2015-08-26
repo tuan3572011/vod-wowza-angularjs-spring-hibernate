@@ -31,8 +31,8 @@ public class DataUploadUtility {
 	private static final String BITRATE_720 = "13500000";
 	private static final String BITRATE_480 = "850000";
 
-	public static boolean uploadVideoToWowza(Session session, String videoName,
-			InputStream videoInputStream, InputStream keyInputStream) {
+	public static boolean uploadVideoToWowza(Session session, String videoName, InputStream videoInputStream,
+			InputStream keyInputStream) {
 		boolean isTransferOk = false;
 
 		try {
@@ -40,8 +40,7 @@ public class DataUploadUtility {
 			File localFile = fromStream2File(videoInputStream, "rrr", ".mp4");
 			byte[] buffer = new byte[1500000];
 			System.out.println("begin transfer data scp " + videoName);
-			isTransferOk = transferDataToEc2UsingScp(session, localFile,
-					videoName, VIDEO_DIR_IN_EC2, buffer);
+			isTransferOk = transferDataToEc2UsingScp(session, localFile, videoName, VIDEO_DIR_IN_EC2, buffer);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -49,8 +48,7 @@ public class DataUploadUtility {
 		return isTransferOk;
 	}
 
-	private static File fromStream2File(InputStream in, String PREFIX,
-			String SUFFIX) throws IOException {
+	private static File fromStream2File(InputStream in, String PREFIX, String SUFFIX) throws IOException {
 		final File tempFile = File.createTempFile(PREFIX, SUFFIX);
 		tempFile.deleteOnExit();
 		try (FileOutputStream out = new FileOutputStream(tempFile)) {
@@ -59,20 +57,19 @@ public class DataUploadUtility {
 		return tempFile;
 	}
 
-	public static String generateAndReadVideoKeyFromEc2(Session session,
-			String videoName) {
+	public static String generateAndReadVideoKeyFromEc2(Session session, String videoName) {
 		try {
 			// upload key
-			String fileUpLoadPath = ResourcesFolderUtility
-					.getPathFromResourceFolder(UploadController.class,
-							GEN_KEY_FILE);
+			String fileUpLoadPath = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class,
+					GEN_KEY_FILE);
 			File localFile = new File(fileUpLoadPath);
 			String pathToSaveInServer = HOME_DIR_IN_EC2;
-			boolean isTranferGenKeyCommandFileOk = transferDataToEc2UsingScp(
-					session, localFile, localFile.getName(),
+			boolean isTranferGenKeyCommandFileOk = transferDataToEc2UsingScp(session, localFile, localFile.getName(),
 					pathToSaveInServer, new byte[500]);
+			System.out.println("Transfer key ok " + isTranferGenKeyCommandFileOk);
 			if (isTranferGenKeyCommandFileOk) {
 				// if upload video is ok, generate key for this video
+				System.out.println("begin genkey");
 				generateKeyFileForVideoInEC2(session, videoName);
 				System.out.println("end execute genkey");
 				try {
@@ -81,18 +78,13 @@ public class DataUploadUtility {
 					e.printStackTrace();
 				}
 
-				create480pVideoInEC2(session, videoName);
-				createKeyFileFor480pVideoInEC2(session, videoName);
-				createSmilFileForVideo(session, videoName);
 				// read key of this video
-				ChannelSftp sftpChannel = (ChannelSftp) session
-						.openChannel("sftp");
+				ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
 				sftpChannel.connect();
 				String keyLocation = KEY_DIR_IN_EC2 + videoName + ".key";
 				System.out.println(keyLocation);
 				InputStream inputStream = sftpChannel.get(keyLocation);
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(inputStream));
+				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 				String keyLine = reader.readLine();
 				while (keyLine.isEmpty()) {
 					keyLine = reader.readLine();
@@ -104,6 +96,10 @@ public class DataUploadUtility {
 					key = keyLine.split(":")[1];
 				}
 				System.out.println("key: " + key);
+
+				create480pVideoInEC2(session, videoName);
+				createKeyFileFor480pVideoInEC2(session, videoName);
+				createSmilFileForVideo(session, videoName);
 				if (key != null) {
 					return key;
 				}
@@ -115,62 +111,74 @@ public class DataUploadUtility {
 		return "";
 	}
 
-	private static void generateKeyFileForVideoInEC2(Session session,
-			String videoName) throws JSchException, IOException {
+	private static void generateKeyFileForVideoInEC2(Session session, String videoName) throws JSchException,
+			IOException {
 		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
 		command.append("cd");
 		command.append(" ");
-		command.append(KEY_DIR_IN_EC2);
+		command.append(HOME_DIR_IN_EC2);
 		command.append("\n");
 
 		command.append("chmod 777");
 		command.append(" ");
 		command.append(GEN_KEY_FILE);
 		command.append("\n");
+
+		command.append("nohup");
+		command.append(" ");
 		command.append("./");
 		command.append(GEN_KEY_FILE);
 		command.append(" ");
 		command.append(videoName);
+		command.append(" ");
+		command.append("&");
 		command.append("\n");
 
-		executeAndCloseChannel(shellChannel, command.toString());
+		executeChannel(shellChannel, command.toString());
 	}
 
-	private static void create480pVideoInEC2(Session session, String videoName)
-			throws JSchException, IOException {
-		String extension = videoName.split(".")[1];
-		String nameWithoutExtension = videoName.split(".")[0];
+	private static void create480pVideoInEC2(Session session, String videoName) throws JSchException, IOException {
+		int indexOfDot = videoName.indexOf(".");
+		String extension = videoName.substring(indexOfDot);
+		String nameWithoutExtension = videoName.substring(0, indexOfDot);
 		String newVideoName = nameWithoutExtension + "_480" + extension;
-		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
 		command.append("cd");
 		command.append(" ");
 		command.append(VIDEO_DIR_IN_EC2);
 		command.append("\n");
 
+		command.append("nohup");
+		command.append(" ");
 		command.append("ffmpeg -i ");
 		command.append(videoName);
 		command.append(" -vf scale=854:480  -b:v 110k ");
 		command.append(newVideoName);
+		command.append(" ");
+		command.append("&");
 		command.append("\n");
-
-		executeAndCloseChannel(shellChannel, command.toString());
+		System.out.println("create 480p video " + command.toString());
+		Channel shellChannel = session.openChannel("shell");
+		executeChannel(shellChannel, command.toString());
 	}
 
-	private static void createKeyFileFor480pVideoInEC2(Session session,
-			String videoName) throws JSchException, IOException {
+	private static void createKeyFileFor480pVideoInEC2(Session session, String videoName) throws JSchException,
+			IOException {
 		int indexOfDot = videoName.indexOf(".");
 		String nameWithoutExtension = videoName.substring(0, indexOfDot);
 		String extension = videoName.substring(indexOfDot);
 		String newVideoName = nameWithoutExtension + "_480" + extension;
 		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
+
 		command.append("cd");
 		command.append(" ");
 		command.append(KEY_DIR_IN_EC2);
 		command.append("\n");
 
+		command.append("nohup");
+		command.append(" ");
 		command.append("cp");
 		command.append(" ");
 		command.append(videoName);
@@ -178,21 +186,32 @@ public class DataUploadUtility {
 		command.append(" ");
 		command.append(newVideoName);
 		command.append(".key");
+		command.append(" ");
+		command.append("&");
 		command.append("\n");
 
-		executeAndCloseChannel(shellChannel, command.toString());
+		executeChannel(shellChannel, command.toString());
 	}
 
-	private static void createSmilFileForVideo(Session session, String videoName)
-			throws JSchException, IOException {
+	private static void createSmilFileForVideo(Session session, String videoName) throws JSchException, IOException {
 		int indexOfDot = videoName.indexOf(".");
 		String nameWithoutExtension = videoName.substring(0, indexOfDot);
 		String newName = nameWithoutExtension + ".smil";
 		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
+
+		command.append("cd");
+		command.append(" ");
+		command.append(VIDEO_DIR_IN_EC2);
+		command.append("\n");
+
+		command.append("nohup");
+		command.append(" ");
 		command.append("touch");
 		command.append(" ");
 		command.append(newName);
+		command.append(" ");
+		command.append("&");
 		command.append("\n");
 
 		command.append("echo");
@@ -263,20 +282,24 @@ public class DataUploadUtility {
 		command.append(newName);
 		command.append("\n");
 
-		executeAndCloseChannel(shellChannel, command.toString());
+		System.out.println("create smil file: " + command.toString());
+		executeChannel(shellChannel, command.toString());
 	}
 
-	private static void executeAndCloseChannel(Channel shellChannel,
-			String command) throws JSchException, IOException {
+	private static void executeChannel(Channel shellChannel, String command) throws JSchException, IOException {
 		shellChannel.setInputStream(IOUtils.toInputStream(command, "UTF-8"));
 		shellChannel.setOutputStream(System.out);
 		shellChannel.connect();
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		shellChannel.disconnect();
 	}
 
-	private static boolean transferDataToEc2UsingScp(Session ss,
-			File localFile, String videoName, String pathToSaveInServer,
-			byte[] buffer) {
+	private static boolean transferDataToEc2UsingScp(Session ss, File localFile, String videoName,
+			String pathToSaveInServer, byte[] buffer) {
 		BufferedOutputStream bufferedOutput = null;
 		Channel channel = null;
 		try {
@@ -305,8 +328,7 @@ public class DataUploadUtility {
 
 			// send a content of lfile
 			InputStream inputStream = new FileInputStream(localFile);
-			BufferedInputStream bufferedInput = new BufferedInputStream(
-					inputStream);
+			BufferedInputStream bufferedInput = new BufferedInputStream(inputStream);
 			bufferedOutput = new BufferedOutputStream(out);
 			long existSize = fileSize;
 			while (true) {
@@ -318,9 +340,7 @@ public class DataUploadUtility {
 				bufferedOutput.flush();
 				existSize -= length;
 
-				System.out.println((int) ((double) (fileSize - existSize)
-						/ fileSize * 100)
-						+ " %");
+				System.out.println((int) ((double) (fileSize - existSize) / fileSize * 100) + " %");
 				System.out.println(existSize);
 			}
 			bufferedInput.close();
@@ -350,4 +370,3 @@ public class DataUploadUtility {
 
 	}
 }
-

@@ -47,8 +47,8 @@ public class UploadController {
 	}
 
 	@RequestMapping(value = "/Image/Save", method = RequestMethod.POST)
-	public String doUploadImage(@RequestParam("image") MultipartFile multipart,
-			Map<String, Object> map) throws IOException {
+	public String doUploadImage(@RequestParam("image") MultipartFile multipart, Map<String, Object> map)
+			throws IOException {
 		System.out.println("save image");
 		InputStream inputStream = null;
 		if (!multipart.isEmpty()) {
@@ -56,8 +56,7 @@ public class UploadController {
 				inputStream = multipart.getInputStream();
 				String originName = multipart.getOriginalFilename();
 				long length = multipart.getSize();
-				String imageType = originName
-						.substring(originName.length() - 3);
+				String imageType = originName.substring(originName.length() - 3);
 
 				String contentType = "";
 				if (imageType.equals("png")) {
@@ -78,12 +77,9 @@ public class UploadController {
 				String name = this.randomName() + "." + imageType;
 
 				String folder = "Images";
-				boolean isOK = UploadController.uploadDataToS3(inputStream,
-						folder, name, length, contentType);
+				boolean isOK = UploadController.uploadDataToS3(inputStream, folder, name, length, contentType);
 				if (isOK) {
-					map.put("message",
-							"https://s3-ap-southeast-1.amazonaws.com/vod-wowza/"
-									+ folder + "/" + name);
+					map.put("message", "https://s3-ap-southeast-1.amazonaws.com/vod-wowza/" + folder + "/" + name);
 				} else {
 					map.put("message", "FAIL");
 				}
@@ -101,27 +97,22 @@ public class UploadController {
 	}
 
 	@RequestMapping(value = "/Trailer/Save", method = RequestMethod.POST)
-	public String doUploadTrailer(
-			@RequestParam("trailer") MultipartFile multipart,
-			Map<String, Object> map) throws IOException {
+	public String doUploadTrailer(@RequestParam("trailer") MultipartFile multipart, Map<String, Object> map)
+			throws IOException {
 		InputStream inputStream = null;
 		if (!multipart.isEmpty()) {
 			try {
 				inputStream = multipart.getInputStream();
 				String originName = multipart.getOriginalFilename();
 				long length = multipart.getSize();
-				String trailerType = originName
-						.substring(originName.length() - 3);
+				String trailerType = originName.substring(originName.length() - 3);
 				String contentType = "application/octet-stream";
 				String name = this.randomName() + "." + trailerType;
 				String folder = "Trailer";
 				System.out.println("S3 Problem");
-				boolean isOK = UploadController.uploadDataToS3(inputStream,
-						folder, name, length, contentType);
+				boolean isOK = UploadController.uploadDataToS3(inputStream, folder, name, length, contentType);
 				if (isOK) {
-					map.put("message",
-							"https://s3-ap-southeast-1.amazonaws.com/vod-wowza/"
-									+ folder + "/" + name);
+					map.put("message", "https://s3-ap-southeast-1.amazonaws.com/vod-wowza/" + folder + "/" + name);
 				} else {
 					map.put("message", "FAIL");
 				}
@@ -139,9 +130,8 @@ public class UploadController {
 	}
 
 	@RequestMapping(value = "/Film/Save", method = RequestMethod.POST)
-	public String doUploadFilm(
-			@RequestParam("film") MultipartFile multipartFilm,
-			Map<String, Object> map) throws IOException {
+	public String doUploadFilm(@RequestParam("film") MultipartFile multipartFilm, Map<String, Object> map)
+			throws IOException {
 		InputStream videoInputStream = null;
 		InputStream keyInputStream = null;
 		if (!multipartFilm.isEmpty()) {
@@ -152,8 +142,7 @@ public class UploadController {
 				// validate video name
 				String videoName = this.randomName() + ".mp4";
 				System.out.println("begin upto wowza");
-				boolean isOK = this.uploadDataToWowza(hostAndUser,
-						videoInputStream, videoName, keyInputStream);
+				boolean isOK = this.uploadDataToWowza(hostAndUser, videoInputStream, videoName, keyInputStream);
 				System.out.println("end upto wowza");
 				if (isOK) {
 					map.put("message", videoName);
@@ -169,18 +158,16 @@ public class UploadController {
 		return "UploadFilm";
 	}
 
-	private boolean uploadDataToWowza(String hostAndUser,
-			InputStream videoInputStream, String videoName,
+	private boolean uploadDataToWowza(String hostAndUser, InputStream videoInputStream, String videoName,
 			InputStream keyInputStream) {
 
 		// get key path
-		String pathToKey = ResourcesFolderUtility.getPathFromResourceFolder(
-				UploadController.class, "vod1.pem");
+		String pathToKey = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class, "vod1.pem");
 		System.out.println(pathToKey);
 		// open jsch session
 		Session jschSession = null;
 		try {
-			jschSession = this.getJschSession(pathToKey, hostAndUser);
+			jschSession = getJschSession(pathToKey, hostAndUser);
 			jschSession.connect();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -188,24 +175,23 @@ public class UploadController {
 		}
 		// upload video using this session
 		System.out.println(jschSession.getHost() + jschSession.getUserName());
-		DataUploadUtility.uploadVideoToWowza(jschSession, videoName,
-				videoInputStream, keyInputStream);
+		DataUploadUtility.uploadVideoToWowza(jschSession, videoName, videoInputStream, keyInputStream);
 		System.out.println("end upload video");
 		// generate key and read key from server
-		video_upload_secret_key = DataUploadUtility
-				.generateAndReadVideoKeyFromEc2(jschSession, videoName);
+		video_upload_secret_key = DataUploadUtility.generateAndReadVideoKeyFromEc2(jschSession, videoName);
 		// close session
 		jschSession.disconnect();
+		System.out.println("session close");
 		if (video_upload_secret_key.isEmpty()) {
 			return false;
 		} else {
+//			jschSession.disconnect();
 			return true;
 		}
 	}
 
-	private static boolean uploadDataToS3(InputStream inputStream,
-			String folder, String fileName, long fileLength, String contentType)
-		
+	private static boolean uploadDataToS3(InputStream inputStream, String folder, String fileName, long fileLength,
+			String contentType)
 
 	throws IOException {
 		boolean result = false;
@@ -213,16 +199,14 @@ public class UploadController {
 		String keyName = folder + "/" + fileName;
 
 		AmazonS3 s3Client = new AmazonS3Client(new PropertiesCredentials(
-				UploadController.class
-						.getResourceAsStream("AwsCredentials.properties")));
+				UploadController.class.getResourceAsStream("AwsCredentials.properties")));
 
 		// s3Client.setEndpoint("autoscaling.ap-southeast-1.amazonaws.com");
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentType(contentType);
 		objectMetadata.setContentLength(fileLength);
-		PutObjectRequest putObjectRequest = new PutObjectRequest(
-				existingBucketName, keyName, inputStream, objectMetadata)
-				.withCannedAcl(CannedAccessControlList.PublicRead);
+		PutObjectRequest putObjectRequest = new PutObjectRequest(existingBucketName, keyName, inputStream,
+				objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead);
 		PutObjectResult result1 = s3Client.putObject(putObjectRequest);
 		inputStream.close();
 		result = true;
@@ -230,8 +214,7 @@ public class UploadController {
 		return result;
 	}
 
-	private static Session getJschSession(String pathToKey, String hostAndUser)
-			throws JSchException {
+	private static Session getJschSession(String pathToKey, String hostAndUser) throws JSchException {
 		String[] hostAndUserArr = hostAndUser.split("@");
 		if (hostAndUserArr.length != 2)
 			return null;

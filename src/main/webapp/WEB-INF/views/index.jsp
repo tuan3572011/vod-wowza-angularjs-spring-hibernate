@@ -72,6 +72,8 @@
 <script src="resources/js/controllers/RegisFilmController.js"></script>
 <script src="resources/js/controllers/CaNhanController.js"></script>
 <script src="resources/js/controllers/RegisterUserController.js"></script>
+<script src="resources/js/controllers/StarringController.js"></script>
+<script src="resources/js/controllers/DirectorController.js"></script>
 
 <script
 	src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
