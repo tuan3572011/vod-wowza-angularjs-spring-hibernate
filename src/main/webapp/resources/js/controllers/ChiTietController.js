@@ -21,17 +21,17 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 			RegisService.checkRegis(data.movie).success(function(dataRegis) {
 				$scope.hasBought = dataRegis;
 				sessionStorage.setItem("hasBought", dataRegis);
-			}).error(function() {
-				alert("ERROR");
+			}).error(function(error) {
+				console.error(error);
 			});
 
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 		FilmUtilityService.getComments(movieId).success(function(data2) {
 			$rootScope.comments = data2;
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 	};
@@ -66,8 +66,8 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 			$rootScope.allRelativeMovies = data;
 			// show relative movie
 			$scope.nextRelativeMovies();
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 	};
@@ -97,8 +97,8 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 
 			// show Hot movie
 			$scope.nextHotMovies();
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 	};
@@ -123,14 +123,20 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 	// go the the player page
 	$scope.playMovie = function(movie) {
 		FilmUtilityService.playMovie(movie).success(function() {
-			sessionStorage.setItem("source", "CamOnViTatCa.mp4");
+			sessionStorage.setItem("source", "288701440603928741.smil");
 			sessionStorage.setItem("movieId", movie.id);
 			sessionStorage.setItem("movieType", "movie");
 			sessionStorage.removeItem("serieId");
 			$location.path('/PlayVideo');
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
+	};
+
+	// go to see starring detail
+	$scope.showStarringDetail = function(starringId) {
+		sessionStorage.setItem("starringId", starringId);
+		$location.path('/Starring');
 	};
 
 	// Open dialog register film
@@ -150,19 +156,18 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 			modalInstance.result.then(function(movie) {
 				RegisService.RegisFilm(movie).success(function(data) {
 					if (data == "OK") {
-						alert("Giao dich thanh cong");
+						console.log("Giao dich thanh cong");
 						$scope.playMovie(movie);
 					} else {
-						alert("Giao dich khong thanh cong");
+						console.log("Giao dich khong thanh cong");
 					}
-				}).error(function() {
-					alert("ERROR");
+				}).error(function(error) {
+					console.error(error);
 				});
 			}, function() {
 
 			});
 		} else {
-			alert("Please login");
 			$location.path("/Login");
 		}
 		;
@@ -174,12 +179,10 @@ var ModalInstanceCtrl = function($scope, $modalInstance, film) {
 	$scope.film = film;
 
 	$scope.ok = function() {
-		alert("OK");
 		$modalInstance.close(film);
 	};
 
 	$scope.cancel = function() {
-		alert("Cancel");
 		$modalInstance.dismiss('cancel');
 	};
 };

@@ -24,8 +24,8 @@ var PlayerController = function($scope, $http, $location, $rootScope, $route,
 		FilmUtilityService.addComment(commentContent).success(function(data) {
 			$rootScope.comments = data;
 			$route.reload();
-		}).error(function(response) {
-			alert(response);
+		}).error(function(error) {
+			console.error(error);
 		});
 	};
 
@@ -96,8 +96,8 @@ var PlayerController = function($scope, $http, $location, $rootScope, $route,
 			// load comments for this episode
 			FilmUtilityService.getComments(movieId).success(function(data2) {
 				$rootScope.comments = data2;
-			}).error(function() {
-				alert("ERROR");
+			}).error(function(error) {
+				console.error(error);
 			});
 		}
 	} else {// user refreshed page
@@ -120,15 +120,15 @@ var PlayerController = function($scope, $http, $location, $rootScope, $route,
 				allStarring = data.movie.starrings;
 				// show starring
 				$scope.nextStarring();
-			}).error(function() {
-				alert("ERROR");
+			}).error(function(error) {
+				console.error(error);
 			});
 		}
 		// load comments
 		FilmUtilityService.getComments(movieId).success(function(data2) {
 			$rootScope.comments = data2;
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 		// load relative movies
@@ -142,8 +142,8 @@ var PlayerController = function($scope, $http, $location, $rootScope, $route,
 
 					// load relative movies
 					$scope.nextRelativeMovies();
-				}).error(function() {
-			alert("ERROR");
+				}).error(function(error) {
+			console.error(error);
 		});
 
 		// load hot movies
@@ -152,8 +152,8 @@ var PlayerController = function($scope, $http, $location, $rootScope, $route,
 
 			// show Hot movie
 			$scope.nextHotMovies();
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 	}
 	;

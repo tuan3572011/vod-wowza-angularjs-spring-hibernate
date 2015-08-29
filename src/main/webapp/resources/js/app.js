@@ -64,7 +64,7 @@ App
 					});
 
 					$routeProvider.when('/Starring', {
-						templateUrl : 'StarringController/',
+						templateUrl : 'DienVienController/DetailLayout',
 						controller : StarringController
 					});
 
@@ -213,6 +213,19 @@ App.service('SerieService', [ '$http', function($http) {
 	};
 } ]);
 
+App.service('StarringService', [ '$http', function($http) {
+	this.getStarringDetail = function(starringId) {
+		var req = {
+			method : 'GET',
+			url : 'DienVienController/StarringDetail/' + starringId,
+			headers : {
+				"Content-Type" : "application/json"
+			}
+		};
+		return $http(req);
+	};
+} ]);
+
 App.service('FilmUtilityService', [ '$http', '$rootScope',
 		function($http, $rootScope) {
 			this.getComments = function(movieId) {
@@ -271,7 +284,6 @@ App.service('FilmUtilityService', [ '$http', '$rootScope',
 				var movieId = movie.id;
 				var email = $rootScope.user.email;
 				var type = movie.type;
-				alert(email);
 				var req = {
 					method : 'POST',
 					url : 'PlayerAuthenticationController',

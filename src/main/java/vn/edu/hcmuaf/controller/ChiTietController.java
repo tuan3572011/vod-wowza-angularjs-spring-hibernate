@@ -52,26 +52,5 @@ public class ChiTietController {
 		return movies;
 	}*/
 
-	@ResponseBody
-	@RequestMapping(value = "/LoadStarring", method = RequestMethod.GET)
-	public List<Starring> slideShowDienVien(
-			@RequestParam(value = "movieId") Integer movieId) {
-		List<Starring> starrings = null;
-		RestTemplate restTemplate = new RestTemplate();
-		ParameterizedTypeReference<List<Starring>> responseType = new ParameterizedTypeReference<List<Starring>>() {
-		};
-		Map<String, Integer> params = new HashMap<String, Integer>();
-		params.put("movieId", movieId);
-		ResponseEntity<List<Starring>> result = restTemplate.exchange(
-				LinkService.STAR_GETBY_ID, HttpMethod.GET, null, responseType,
-				params);
-		if (result.getStatusCode().equals(HttpStatus.OK)) {
-			starrings = result.getBody();
-			starrings.addAll(starrings);
-			starrings.addAll(starrings);
-			starrings.addAll(starrings);
-		}
-		return starrings;
-	}
 
 }
