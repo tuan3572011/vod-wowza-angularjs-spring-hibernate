@@ -3,6 +3,7 @@
 	pageEncoding="UTF-8"%>
 <link href="resources/videojs/video-js.css" rel="stylesheet">
 <script src="resources/videojs/video.js"></script>
+<link href="resources/videojs/videojs-sublime-skin.css" rel="stylesheet">
 
 <!-- Media Sources plugin -->
 <script src="resources/videojs/videojs-media-sources.js"></script>
@@ -30,6 +31,8 @@
 <script src="resources/videojs/segment/bin-utils.js"></script>
 
 
+<link rel="stylesheet" href="resources/videojs/selector.css" />
+<script src="resources/videojs/selector.js"></script>
 
 <style>
 <!--
@@ -92,24 +95,10 @@ p.wrapBlock {
 	<article>
 		<!-- Header -->
 		<header id="top" class="header">
-			<div class="text-vertical-center" id="containVideo">
-				<!-- <video width="930" height="500" controls id="video"
-					class="video-js vjs-default-skin">
-					<source
-						src="http://54.255.233.183:1935/vod-project/288701440603928741.smil/playlist.m3u"
-						type="application/x-mpegurl" id="videoSource" />
-				</video> -->
-
-			</div>
+			<div class="text-vertical-center" id="containVideo"></div>
 		</header>
 	</article>
-	<article>
-		<label>Chất lượng phim: </label> <select name=“quality”>
-			<option onclick="reloadVideo('.smil');">Auto</option>
-			<option onclick="reloadVideo('_480.mp4');">480p</option>
-			<option onclick="reloadVideo('.mp4');">720p</option>
-		</select>
-	</article>
+
 	<article>
 		<section id="service" class="service bg-primary"
 			style="padding: 10px; background-color: #1a1917">
@@ -122,6 +111,13 @@ p.wrapBlock {
 							class="glyphicon glyphicon-off"></span> Tắt đèn
 						</a>
 					</div>
+					<div class="col-xs-12 col-md-6  col-lg-12" style="width: 95%">
+						<label>Các tập tiếp theo</label>
+						<div style="position: relative;" ng-repeat="episode in episodes">
+							<button style="float: left" class="btn btn-info btn-fix">{{episode.noEpisode}}</button>
+						</div>
+					</div>
+
 				</div>
 				<!-- /.row -->
 			</div>
@@ -370,42 +366,61 @@ p.wrapBlock {
 </script>
 
 <script>
-	function playVideo(videoShortType) {
+	function loadVideo() {
 		$(document)
 				.ready(
 						function() {
+
+							//$("#video").remove();
 							var source = '<video width="930" height="500" controls  id="video" class="video-js vjs-default-skin"  >';
 							source = source
-									+ '<source src="http://54.255.233.183:1935/vod-project/Microsoft/playlist.m3u" type="application/x-mpegurl" id="videoSource" /> </video>';
-							source = source + " ";
-							var videoName = sessionStorage.getItem("source");
-							source = source.replace("Microsoft", videoName);
-							source = source.replace(".mp4", videoShortType);
-							$("#containVideo").append(source);
-
-							videojs('#video');
-						});
-	}
-	function reloadVideo(videoShortType) {
-		$(document)
-				.ready(
-						function() {
-							var player = videojs("#video");
-							player.dispose();
-							$("#video").remove();
-							alert("rm html");
-							var source = '<video width="930" height="500" controls  id="video" class="video-js vjs-default-skin"  >';
+									+ '<source src="Microsoft_480" type="application/x-mpegurl" id="videoSource" data-res="480"/>';
 							source = source
-									+ '<source src="http://54.255.233.183:1935/vod-project/Microsoft/playlist.m3u" type="application/x-mpegurl" id="videoSource" /> </video>';
+									+ '<source src="Microsoft_Auto" type="application/x-mpegurl" data-res="Auto"/>';
+							source = source
+									+ '<source src="Microsoft_720" type="application/x-mpegurl"  data-res="720"/> </video>';
 							source = source + " ";
+							var originLink = "http://54.255.233.183:1935/vod-project/Microsoft/playlist.m3u";
 							var videoName = sessionStorage.getItem("source");
-							source = source.replace("Microsoft", videoName);
-							source = source.replace(".mp4", videoShortType);
+							var originName = originLink.replace("Microsoft",
+									videoName);
+							source = source.replace("Microsoft_480",
+									getVideoName_480p(originName));
+							source = source
+									.replace("Microsoft_720", originName);
+							source = source.replace("Microsoft_Auto",
+									getVideoName_Auto(originName));
 							$("#containVideo").append(source);
+							alert(source);
+							qualitySelectorSetup();
 
-							videojs('#video');
+							var player = videojs('video');
 						});
+
 	}
-	playVideo(".smil");
+	function qualitySelectorSetup() {
+		videojs('#video', {
+			plugins : {
+				resolutionSelector : {
+					default_res : "720"
+				}
+			}
+		}, function() {
+			var player = this;
+			player.on('changeRes', function() {
+				console.log('Current Res is: ' + player.getCurrentRes());
+			});
+
+		});
+	}
+
+	function getVideoName_480p(originName) {
+		return originName.replace(".mp4", "_480.mp4");
+	}
+
+	function getVideoName_Auto(originName) {
+		return originName.replace(".mp4", ".smil");
+	}
+	loadVideo();
 </script>
 

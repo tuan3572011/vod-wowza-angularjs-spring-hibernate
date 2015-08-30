@@ -123,7 +123,7 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 	// go the the player page
 	$scope.playMovie = function(movie) {
 		FilmUtilityService.playMovie(movie).success(function() {
-			sessionStorage.setItem("source", "288701440603928741.smil");
+			sessionStorage.setItem("source", "288701440603928741.mp4");
 			sessionStorage.setItem("movieId", movie.id);
 			sessionStorage.setItem("movieType", "movie");
 			sessionStorage.removeItem("serieId");

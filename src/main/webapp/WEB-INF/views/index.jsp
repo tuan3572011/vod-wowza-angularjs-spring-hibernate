@@ -37,6 +37,7 @@
 <script src="resources/bootstrap/js/validator.js"></script>
 <script src="resources/bootstrap/js/rating.js"></script>
 
+
 <!-- Custom Fonts -->
 <link rel="stylesheet"
 	href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
@@ -73,7 +74,6 @@
 <script src="resources/js/controllers/CaNhanController.js"></script>
 <script src="resources/js/controllers/RegisterUserController.js"></script>
 <script src="resources/js/controllers/StarringController.js"></script>
-<script src="resources/js/controllers/DirectorController.js"></script>
 
 <script
 	src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.10.0.js"></script>
@@ -284,7 +284,7 @@ body {
 				var myExp = new RegExp(searchField, "i");
 				var found = 0;
 				var max = 0;
-				$.getJSON('PhimBoController/jsonsearch',
+				$.getJSON('http://localhost:8080/hcmuaf/PhimBoController/jsonsearch',
 								function(data) {
 									var output = '<ul class="suggestsearch cf" ng-controller="FilmRedirectController">';
 									$.each(data,
