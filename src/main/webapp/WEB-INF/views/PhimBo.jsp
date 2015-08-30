@@ -5,98 +5,94 @@
 <section>
 	<div class="container" style="width: 100%">
 		<div class="thumbnail thumb-fix">
-			<form action="#" method="get">
-				<!--  OrderBy -->
-				<div class="row">
-					<div class="col-xs-12 col-sm-6 col-lg-3">
-						<div class="form-group">
-							<label>Sap xep</label> <select class="form-control"
-								name="orderBy" class="form-control">
-								<option>View</option>
-								<option></option>
-								<option>Comment</option>
-								<option selected="selected">All</option>
-							</select>
-						</div>
-					</div>
-
-					<!--  Category -->
-					<div class="col-xs-12 col-sm-6 col-lg-3">
-						<div class="form-group">
-							<label>Category</label> <select class="form-control"
-								name="category">
-							</select>
-						</div>
-					</div>
-					<!--  Publish Date -->
-					<div class="col-xs-12 col-sm-6 col-lg-3">
-						<div class="form-group">
-							<label>Nam phat hanh</label> <select class="form-control"
-								name="searchByYear">
-								<option value="2015">2015</option>
-								<option value="2014">2014</option>
-								<option value="2013">2013</option>
-								<option value="2012">2012</option>
-								<option value="2011">2011 về trước</option>
-								<option selected="selected">All</option>
-							</select>
-						</div>
-					</div>
-					<!--  Country -->
-					<div class="col-xs-12 col-sm-6 col-lg-3">
-						<div class="form-group">
-							<label>Country</label> <select class="form-control"
-								name="country">
-								<option value="VN">VN</option>
-								<option selected="selected">All</option>
-							</select>
-						</div>
+			<div class="row">
+				<div class="col-xs-12 col-sm-6 col-lg-3">
+					<div class="form-group">
+						<label><spring:message code="film.OrderBy" /></label> <select
+							ng-change="sortFilm()" ng-init="sort = sorts[0]"
+							ng-options="sort as sort.name for sort in sorts"
+							class="form-control" ng-model="sort">
+						</select>
 					</div>
 				</div>
-			</form>
+
+				<!--  Category -->
+				<div class="col-xs-12 col-sm-6 col-lg-3">
+					<div class="form-group">
+						<label><spring:message code="film.Category" /></label> <select
+							ng-change="categoryFilm()" ng-init="category = categoriesS[0]"
+							ng-options="category as category.name for category in categoriesS"
+							class="form-control" ng-model="category">
+						</select>
+					</div>
+				</div>
+				<!--  Publish Date -->
+				<div class="col-xs-12 col-sm-6 col-lg-3">
+					<div class="form-group">
+						<label><spring:message code="film.PublishDate" /></label> <select
+							ng-change="publishFilm()" autofocus="autofocus"
+							ng-init="publishYear = publishYears[0]"
+							ng-options="publishYear as publishYear.name for publishYear in publishYears"
+							class="form-control" ng-model="publishYear">
+						</select>
+					</div>
+				</div>
+				<!--  Country -->
+				<div class="col-xs-12 col-sm-6 col-lg-3">
+					<div class="form-group">
+						<label><spring:message code="film.Country" /></label> <select
+							ng-change="countryFilm()" ng-init="country = countriesS[0]"
+							ng-options="country as country.name for country in countriesS"
+							class="form-control" ng-model="country">
+						</select>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="thumbnail thumb-fix2">
 			<div class="row">
 				<div class="clg-lg-12">
 					<article>
 						<div class="row" style="margin-left: 10px">
-							<c:forEach items="${movies }" var="movie">
-								<div class="col-xs-12 col-sm-6 col-lg-2"
-									style="margin-right: 80px">
-									<div class="thumbnail fix">
-										<div class="caption">
-											<header>${movie.engName}<span>${movie.vnName}</span>
-											</header>
-											<footer>
-												<a href="${movie.trailer }" data-toggle="lightbox"
-													data-gallery="youtubevideos" class="btn btn-success">
-													Trailer</a><a class="btn btn-info"
-													data-ng-click="SerieDetail('${movie.id}','${movie.type}')">Chi
-													tiết</a>
-											</footer>
-											<!-- /.modal-content -->
-										</div>
-										<div>
-											<img class="fixImg" alt="..." src="${movie.image}"> <span
-												class="badge bad-fix">IMDb: <c:if
-													test="${not empty movie.imdb }">
-												${movie.imdb } 
-												</c:if> <c:if test="${empty movie.imdb }">
-												N/A
-												</c:if>
-											</span> <span class="badge bad-fix bad-fix2">${movie.publishedYear }</span>
-										</div>
+							<div class="col-xs-12 col-sm-6 col-lg-2"
+								style="margin-right: 80px" ng-repeat="movie in movies">
+								<div class="thumbnail fix">
+									<div class="caption">
+										<header>
+											{{movie.engName}}<span>{{movie.vnName}}</span>
+										</header>
+										<footer>
+											<a href="{{movie.trailer }}" data-toggle="lightbox"
+												data-gallery="youtubevideos" class="btn btn-success">
+												Trailer</a><a class="btn btn-info"
+												data-ng-click="SerieDetail(movie.id,movie.type)">Chi
+												tiết</a>
+										</footer>
+										<!-- /.modal-content -->
+									</div>
+									<div>
+										<img class="fixImg" alt="..." src="{{movie.image}}"> <span
+											class="badge bad-fix">IMDb: <span
+											ng-if="movie.imdb != null">{{movie.imdb }}</span> <span
+											ng-if="movie.imdb == null">N/A</span>
+										</span> <span class="badge bad-fix bad-fix2">{{movie.publishedYear
+											}}</span>
 									</div>
 								</div>
-							</c:forEach>
+								<script type="text/javascript">
+									$('.fix').hover(
+											function() {
+												$(this).find('.caption')
+														.slideDown(250); // .fadeIn(250)
+											},
+											function() {
+												$(this).find('.caption')
+														.slideUp(250); // .fadeOut(205)
+											});
+								</script>
+							</div>
 						</div>
-						<script type="text/javascript">
-							$('.fix').hover(function() {
-								$(this).find('.caption').slideDown(250); // .fadeIn(250)
-							}, function() {
-								$(this).find('.caption').slideUp(250); // .fadeOut(205)
-							});
-						</script>
+
 						<div style="padding-left: 30%;">
 							<form>
 								<input type="submit" name="home" value="&lt;&lt;"

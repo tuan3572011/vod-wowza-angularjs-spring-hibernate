@@ -55,14 +55,14 @@ p.wrapBlock {
 							</tr>
 							<tr>
 								<td><label style="color: #A78613;">Quốc gia</label><br>
-									<label ng-repeat="country in movie.countries">{{country.name}}
+									<label ng-repeat="country in movie.countries">{{country.name}}, 
 								</label></td>
 								<td><label style="color: #A78613;">Năm sản xuất</label><br>
 									<label>{{movie.publishedYear}}</label></td>
 							</tr>
 							<tr>
 								<td><label style="color: #A78613;">Thể loại</label><br>
-									<label ng-repeat="category in movie.categories">{{category.name}}
+									<label ng-repeat="category in movie.categories">{{category.name}}, 
 								</label></td>
 								<td><label style="color: #A78613;">Đạo diễn</label><br>
 									<label>{{movie.director.name}}</label></td>
@@ -214,7 +214,7 @@ p.wrapBlock {
 	<!-- end Phim Liên Quan -->
 
 	<!-- Phim hot -->
-	<article>
+	<article ng-controller="FilmRedirectController" >
 		<div class="thumbnail thumb-fix2">
 			<fieldset>
 				<legend>
@@ -222,10 +222,9 @@ p.wrapBlock {
 				</legend>
 				<div class="row">
 					<div class="col-lg-2 col2-fix" ng-repeat="movie in hotMovies">
-						<div class="image-container"
-							data-ng-click="showMovieDetail(movie.id)">
+						<div class="image-container">
 							<div class="capt-fix-act2">
-								<div class="caption img-detail">
+								<div style="cursor:pointer;" class="caption img-detail" ng-click="Redirect(movie.id,movie.type)">
 									<h4>{{movie.vnName}}</h4>
 									<!-- /.modal-content -->
 								</div>
@@ -302,16 +301,5 @@ p.wrapBlock {
             <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
         </div>
     </script>
-	<script>
-		function RedirectFunc(movieId, type) {
-			if (type == "movie") {
-				sessionStorage.setItem("movieId", movieId);
-				window.location.pathname = "/hcmuaf/#/ChiTiet";
-			} else {
-				sessionStorage.setItem("phimBoId", movieId);
-				window.location.pathname = "/hcmuaf/#/SerieDetail";
-			}
-		}
-	</script>
 </section>
 

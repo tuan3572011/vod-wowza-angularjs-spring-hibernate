@@ -68,6 +68,11 @@ App
 						controller : StarringController
 					});
 
+					$routeProvider.when('/FilmRedirect', {
+						templateUrl : 'ChiTietController/RidirectLayout',
+						controller : FilmRedirectController
+					});
+
 					$routeProvider.otherwise({
 						redirectTo : '/PhimBo'
 					});

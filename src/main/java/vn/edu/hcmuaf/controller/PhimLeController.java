@@ -31,12 +31,13 @@ public class PhimLeController {
 	@RequestMapping("/layout")
 	public String getTrainPartialPage(Map<String, Object> map) {
 		System.out.println("begin phim le layout");
-		map.put("movies", getListMovie());
+		// map.put("movies", getListMovie());
 		return "PhimLe";
 	}
 
 	@RequestMapping(value = "/movie/{movieId}", method = RequestMethod.GET)
-	public @ResponseBody Movie doShowABC(@PathVariable("movieId") String movieId) {
+	public @ResponseBody
+	Movie doShowABC(@PathVariable("movieId") String movieId) {
 		Movie movie = getById(movieId);
 		return movie;
 	}
@@ -47,7 +48,9 @@ public class PhimLeController {
 		return "NewFile";
 	}
 
-	private List<MovieSearch> getListMovie() {
+	@RequestMapping("/GetListPhimLe")
+	public @ResponseBody
+	List<MovieSearch> getListMovie() {
 		List<MovieSearch> movies = null;
 		RestTemplate restTemplate = new RestTemplate();
 		ParameterizedTypeReference<List<MovieSearch>> responseType = new ParameterizedTypeReference<List<MovieSearch>>() {
@@ -58,6 +61,72 @@ public class PhimLeController {
 			movies = result.getBody();
 		}
 		return movies;
+	}
+
+	@RequestMapping(value = "/movie/getByCategory/{cateId}", method = RequestMethod.GET)
+	public @ResponseBody
+	String getMoviesByCategory(@PathVariable("cateId") String cateId) {
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("cateId", cateId);
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(
+				LinkService.MOVIE_GETBY_CATEGORY, String.class, params);
+
+		return str;
+	}
+
+	@RequestMapping(value = "/movie/getByCountry/{countryId}", method = RequestMethod.GET)
+	public @ResponseBody
+	String getMoviesByCountry(@PathVariable("countryId") String countryId) {
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("countryId", countryId);
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(LinkService.MOVIE_GETBY_COUNTRY,
+				String.class, params);
+
+		return str;
+	}
+
+	@RequestMapping(value = "/movie/getByYear/{year}", method = RequestMethod.GET)
+	public @ResponseBody
+	String getMoviesByYear(@PathVariable("year") String year) {
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("year", year);
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(LinkService.MOVIE_GETBY_YEAR,
+				String.class, params);
+
+		return str;
+	}
+
+	@RequestMapping(value = "/movie/getByView", method = RequestMethod.GET)
+	public @ResponseBody
+	String getMoviesByView() {
+
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(LinkService.MOVIE_GETBY_VIEW,
+				String.class);
+
+		return str;
+	}
+
+	@RequestMapping(value = "/movie/getByRate", method = RequestMethod.GET)
+	public @ResponseBody
+	String getMoviesByRate() {
+
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(LinkService.MOVIE_GETBY_RATE,
+				String.class);
+
+		return str;
 	}
 
 	private Movie getById(String movieId) {

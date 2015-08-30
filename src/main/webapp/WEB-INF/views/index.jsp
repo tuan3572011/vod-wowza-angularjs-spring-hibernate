@@ -267,13 +267,14 @@ body {
 	</script>
 	<script>
 		function RedirectFunc(movieId, type) {
+			sessionStorage.setItem("isFromSearch", "OK");
+			sessionStorage.setItem("type", type);
 			if (type == "movie") {
 				sessionStorage.setItem("movieId", movieId);
-				window.location.pathname = "/hcmuaf/#/ChiTiet";
 			} else {
-				sessionStorage.setItem("serieId", movieId);
-				window.location.pathname = "/hcmuaf/#/SerieDetail";
+				sessionStorage.setItem("phimBoId", movieId);
 			}
+			window.location.pathname = "/hcmuaf/#/FilmRedirect";
 		}
 	</script>
 	<script type="text/javascript">
@@ -284,10 +285,14 @@ body {
 				var myExp = new RegExp(searchField, "i");
 				var found = 0;
 				var max = 0;
-				$.getJSON('http://localhost:8080/hcmuaf/PhimBoController/jsonsearch',
+				$
+						.getJSON(
+								'http://localhost:8080/hcmuaf/PhimBoController/jsonsearch',
 								function(data) {
 									var output = '<ul class="suggestsearch cf" ng-controller="FilmRedirectController">';
-									$.each(data,
+									$
+											.each(
+													data,
 													function(key, val) {
 														if (max >= 5) {
 															return;
@@ -376,7 +381,7 @@ body {
 					&& container.has(e.target).length === 0) // ... nor a descendant of the container
 			{
 				container2.hide();
-			}else{
+			} else {
 				container2.show();
 			}
 		});

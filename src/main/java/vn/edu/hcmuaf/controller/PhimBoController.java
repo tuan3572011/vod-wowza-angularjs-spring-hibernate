@@ -29,7 +29,6 @@ public class PhimBoController {
 
 	@RequestMapping("/layout")
 	public String getTrainPartialPage(Map<String, Object> map) {
-		map.put("movies", getListMovie());
 		return "PhimBo";
 	}
 
@@ -43,13 +42,16 @@ public class PhimBoController {
 	@RequestMapping(value = "/jsonsearch", method = RequestMethod.GET)
 	public @ResponseBody
 	String doGetJsonSearch() {
+
 		RestTemplate restTemplate = new RestTemplate();
 		String result = restTemplate.getForObject(LinkService.SEARCH_FILM_JSON,
 				String.class);
 		return result;
 	}
 
-	private List<MovieSearch> getListMovie() {
+	@RequestMapping(value = "/GetListSerie", method = RequestMethod.GET)
+	private @ResponseBody
+	List<MovieSearch> getListMovie() {
 		List<MovieSearch> movies = null;
 		RestTemplate restTemplate = new RestTemplate();
 		ParameterizedTypeReference<List<MovieSearch>> responseType = new ParameterizedTypeReference<List<MovieSearch>>() {
@@ -61,6 +63,48 @@ public class PhimBoController {
 		}
 
 		return movies;
+	}
+
+	@RequestMapping(value = "/serie/getByYear/{year}", method = RequestMethod.GET)
+	public @ResponseBody
+	String doGetByYear(@PathVariable("year") String year) {
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("year", year);
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(
+				LinkService.SERIE_GETBY_YEAR, String.class, params);
+
+		return str;
+	}
+	
+	@RequestMapping(value = "/serie/getByCountry/{countryId}", method = RequestMethod.GET)
+	public @ResponseBody
+	String doGetByCountry(@PathVariable("countryId") String countryId) {
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("countryId", countryId);
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(
+				LinkService.SERIE_GETBY_COUNTRY, String.class, params);
+
+		return str;
+	}
+	
+	@RequestMapping(value = "/serie/getByCategory/{cateId}", method = RequestMethod.GET)
+	public @ResponseBody
+	String doGetByCategory(@PathVariable("cateId") String cateId) {
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("cateId", cateId);
+		RestTemplate restTemplate = new RestTemplate();
+
+		String str = restTemplate.getForObject(
+				LinkService.SERIE_GETBY_CATEGORY, String.class, params);
+
+		return str;
 	}
 
 	private MovieSerie getById(String movieId) {
