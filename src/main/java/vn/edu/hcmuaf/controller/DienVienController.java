@@ -1,19 +1,19 @@
-package vn.edu.hcmuaf.controller.admin;
+package vn.edu.hcmuaf.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.ParameterizedTypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,11 +24,12 @@ import com.vod.model.Starring;
 @Controller
 @RequestMapping(value = "/DienVienController")
 public class DienVienController {
+	private static final Logger logger = LoggerFactory.getLogger(DienVienController.class);
 
 	@RequestMapping(value = "/layout")
 	public String addStarringLayout(Model model) {
 		model.addAttribute("starring", new Starring());
-		System.out.println("Them dien vien controller");
+		logger.info("Them dien vien controller");
 		return "ThemDienVien";
 	}
 
@@ -50,12 +51,13 @@ public class DienVienController {
 		if (isSaveOk) {
 			model.addAttribute("message", isSaveOk);
 		}
+		logger.info("save starring: " + isSaveOk);
 		return "ThemDienVien";
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/StarringDetail", method = RequestMethod.GET)
-	public Starring getStarringDetail(@RequestParam(value = "starringId") Integer starringId) {
+	@RequestMapping(value = "/StarringDetail/{starringId}", method = RequestMethod.GET)
+	public Starring getStarringDetail(@PathVariable(value = "starringId") Integer starringId) {
 		Starring starring = null;
 		RestTemplate restTemplate = new RestTemplate();
 		Map<String, Integer> params = new HashMap<String, Integer>();
@@ -65,6 +67,7 @@ public class DienVienController {
 		if (result.getStatusCode().equals(HttpStatus.OK)) {
 			starring = result.getBody();
 		}
+		logger.info(starring.getName());
 		return starring;
 	}
 }

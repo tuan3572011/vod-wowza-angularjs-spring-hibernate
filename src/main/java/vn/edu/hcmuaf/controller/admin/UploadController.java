@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,6 +31,7 @@ import com.jcraft.jsch.UserInfo;
 @Controller
 @RequestMapping("/UploadController")
 public class UploadController {
+	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 	private String video_upload_secret_key = "";
 
 	@RequestMapping("/Image/Layout")
@@ -49,7 +52,7 @@ public class UploadController {
 	@RequestMapping(value = "/Image/Save", method = RequestMethod.POST)
 	public String doUploadImage(@RequestParam("image") MultipartFile multipart, Map<String, Object> map)
 			throws IOException {
-		System.out.println("save image");
+		logger.info("save image");
 		InputStream inputStream = null;
 		if (!multipart.isEmpty()) {
 			try {
@@ -79,7 +82,9 @@ public class UploadController {
 				String folder = "Images";
 				boolean isOK = UploadController.uploadDataToS3(inputStream, folder, name, length, contentType);
 				if (isOK) {
-					map.put("message", "https://s3-ap-southeast-1.amazonaws.com/vod-wowza/" + folder + "/" + name);
+					String imageUrl = "https://s3-ap-southeast-1.amazonaws.com/vod-wowza/" + folder + "/" + name;
+					map.put("message", imageUrl);
+					logger.info("image location " + imageUrl);
 				} else {
 					map.put("message", "FAIL");
 				}
@@ -109,7 +114,7 @@ public class UploadController {
 				String contentType = "application/octet-stream";
 				String name = this.randomName() + "." + trailerType;
 				String folder = "Trailer";
-				System.out.println("S3 Problem");
+				logger.info("Upload to S3");
 				boolean isOK = UploadController.uploadDataToS3(inputStream, folder, name, length, contentType);
 				if (isOK) {
 					map.put("message", "https://s3-ap-southeast-1.amazonaws.com/vod-wowza/" + folder + "/" + name);
@@ -138,19 +143,21 @@ public class UploadController {
 			try {
 				// keyInputStream = multipartKey.getInputStream();
 				videoInputStream = multipartFilm.getInputStream();
-				String hostAndUser = "ec2-user@52.74.51.146";
+				String hostAndUser = "ec2-user@54.255.224.27";
 				// validate video name
 				String videoName = this.randomName() + ".mp4";
-				System.out.println("begin upto wowza");
+				logger.info("begin upto wowza");
 				boolean isOK = this.uploadDataToWowza(hostAndUser, videoInputStream, videoName, keyInputStream);
-				System.out.println("end upto wowza");
+				logger.info("end upto wowza");
 				if (isOK) {
 					map.put("message", videoName);
 					map.put("key", video_upload_secret_key);
+					logger.info(videoName + "--" + video_upload_secret_key);
 				} else {
 					map.put("message", "");
 				}
 			} catch (Exception e) {
+				logger.error(e.getMessage());
 				map.put("message", e.getMessage());
 			}
 		}
@@ -163,37 +170,34 @@ public class UploadController {
 
 		// get key path
 		String pathToKey = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class, "vod1.pem");
-		System.out.println(pathToKey);
+		logger.info(pathToKey);
 		// open jsch session
 		Session jschSession = null;
 		try {
 			jschSession = getJschSession(pathToKey, hostAndUser);
 			jschSession.connect();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		// upload video using this session
-		System.out.println(jschSession.getHost() + jschSession.getUserName());
+		logger.info(jschSession.getHost() + jschSession.getUserName());
 		DataUploadUtility.uploadVideoToWowza(jschSession, videoName, videoInputStream, keyInputStream);
-		System.out.println("end upload video");
+		logger.info("end upload video");
 		// generate key and read key from server
 		video_upload_secret_key = DataUploadUtility.generateAndReadVideoKeyFromEc2(jschSession, videoName);
 		// close session
 		jschSession.disconnect();
-		System.out.println("session close");
+		logger.info("session close");
 		if (video_upload_secret_key.isEmpty()) {
 			return false;
 		} else {
-//			jschSession.disconnect();
+			// jschSession.disconnect();
 			return true;
 		}
 	}
 
 	private static boolean uploadDataToS3(InputStream inputStream, String folder, String fileName, long fileLength,
-			String contentType)
-
-	throws IOException {
+			String contentType) throws IOException {
 		boolean result = false;
 		String existingBucketName = "vod-wowza";
 		String keyName = folder + "/" + fileName;
@@ -210,7 +214,7 @@ public class UploadController {
 		PutObjectResult result1 = s3Client.putObject(putObjectRequest);
 		inputStream.close();
 		result = true;
-		System.out.println("Etag:" + result1.getETag() + "-->" + result);
+		logger.info("Etag:" + result1.getETag() + "-->" + result);
 		return result;
 	}
 

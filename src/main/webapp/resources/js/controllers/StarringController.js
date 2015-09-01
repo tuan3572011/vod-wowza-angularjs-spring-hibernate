@@ -12,5 +12,6 @@ var StarringController = function($scope, $http, $rootScope, $route,
 			console.error(error);
 		});
 	}
+	starringDetail();
 
 };

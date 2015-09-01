@@ -22,8 +22,8 @@ var CaNhanController = function($scope, $http, $rootScope, $route) {
 			},
 		};
 		$http(req).success(function(data) {
-			alert(data);
-//			window.location.reload(true);
+			console.log(data);
+			// window.location.reload(true);
 		});
 	};
 

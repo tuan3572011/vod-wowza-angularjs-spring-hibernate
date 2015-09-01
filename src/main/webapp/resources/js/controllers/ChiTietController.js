@@ -123,7 +123,7 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 	// go the the player page
 	$scope.playMovie = function(movie) {
 		FilmUtilityService.playMovie(movie).success(function() {
-			sessionStorage.setItem("source", "288701440603928741.mp4");
+			sessionStorage.setItem("source", movie.name);
 			sessionStorage.setItem("movieId", movie.id);
 			sessionStorage.setItem("movieType", "movie");
 			sessionStorage.removeItem("serieId");
@@ -134,8 +134,8 @@ var ChiTietController = function($scope, $http, $location, $modal, $rootScope,
 	};
 
 	// go to see starring detail
-	$scope.showStarringDetail = function(starringId) {
-		sessionStorage.setItem("starringId", starringId);
+	$scope.showStarringDetail = function(starring) {
+		sessionStorage.setItem("starringId", starring.id);
 		$location.path('/Starring');
 	};
 

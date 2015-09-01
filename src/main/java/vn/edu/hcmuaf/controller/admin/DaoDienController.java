@@ -1,5 +1,7 @@
 package vn.edu.hcmuaf.controller.admin;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,19 +18,19 @@ import com.vod.model.Director;
 @Controller
 @RequestMapping(value = "/DaoDienController")
 public class DaoDienController {
+	private static final Logger logger = LoggerFactory.getLogger(DaoDienController.class);
 
 	@RequestMapping(value = "/layout")
 	public String addDirectorLayout(Model model) {
 		model.addAttribute("director", new Director());
-		System.out.println("Them dao dien controller");
+		logger.info("Them dao dien controller");
 		return "ThemDaoDien";
 	}
 
 	@RequestMapping(value = "/save", method = RequestMethod.POST)
 	public String saveDirector(@ModelAttribute Director director, Model model) {
 		RestTemplate restTemplate = new RestTemplate();
-		ResponseEntity<Void> entity = restTemplate.postForEntity(
-				LinkService.DIRECTOR_ADD, director, Void.class);
+		ResponseEntity<Void> entity = restTemplate.postForEntity(LinkService.DIRECTOR_ADD, director, Void.class);
 
 		boolean isSaveOk = true;
 		if (entity.getStatusCode().equals(HttpStatus.OK)) {

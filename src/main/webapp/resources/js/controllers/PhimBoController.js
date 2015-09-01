@@ -35,7 +35,6 @@ var PhimBoController = function($scope, $location, $rootScope, $http) {
 		id : 2010,
 		name : 'Trước 2011'
 	} ];
-
 	$scope.PhimBo = function() {
 		var req = {
 			method : 'GET',

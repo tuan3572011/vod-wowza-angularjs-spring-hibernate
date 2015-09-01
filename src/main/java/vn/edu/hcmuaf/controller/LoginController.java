@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.http.client.HttpResponseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +29,7 @@ import com.vod.model.User;
 @Controller
 @RequestMapping("/LoginController")
 public class LoginController {
+	private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 	@Autowired
 	@Qualifier("authenticationManager")
 	private AuthenticationManager authManager;
@@ -41,13 +44,10 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/GetUser", method = RequestMethod.POST)
-	public @ResponseBody
-	User getUser() throws HttpResponseException {
-		Authentication authentication = SecurityContextHolder.getContext()
-				.getAuthentication();
+	public @ResponseBody User getUser() throws HttpResponseException {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Object principal = authentication.getPrincipal();
-		if (principal instanceof String
-				&& ((String) principal).equals("anonymousUser")) {
+		if (principal instanceof String && ((String) principal).equals("anonymousUser")) {
 			System.out.println("anymous user");
 			throw new HttpResponseException(401, "You are not loggin");
 		}
@@ -58,24 +58,21 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-	public @ResponseBody
-	String authenticate(@RequestParam(value = "email") String email,
+	public @ResponseBody String authenticate(@RequestParam(value = "email") String email,
 			@RequestParam(value = "password") String password) {
-		System.out.println(email + password);
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-				email, password);
-		System.out.println("begin authenticate");
-		Authentication authentication = this.authManager
-				.authenticate(authenticationToken);
-		System.out.println("end authenticate");
+		logger.info(email + password);
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email,
+				password);
+		logger.info("begin authenticate");
+		Authentication authentication = this.authManager.authenticate(authenticationToken);
+		logger.info("end authenticate");
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		/*
 		 * Reload user as password of authentication principal will be null
 		 * after authorization and password is needed for token generation
 		 */
-		UserDetails userDetails = this.userDetailsService
-				.loadUserByUsername(email);
+		UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
 		return TokenUtils.createToken(userDetails);
 
 	}

@@ -106,7 +106,7 @@ p.wrapBlock {
 							<div class="col-lg-2" ng-repeat="starring in starrings "
 								style="margin-right: 10px">
 								<div class="image-container"
-									data-ng-click="showStarringDetail(starring.id)">
+									data-ng-click="showStarringDetail(starring)">
 									<div class="capt-fix-act">
 										<div class="caption"
 											style="width: 110px; height: 110px; left: 15px;">

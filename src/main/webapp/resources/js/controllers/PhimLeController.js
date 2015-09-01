@@ -83,7 +83,6 @@ var PhimLeController = function($scope, $http, $location, $rootScope) {
 	$scope.sortFilm = function() {
 
 		var sortId = $scope.sort.id;
-		alert(sortId);
 		var urlStr;
 		if (sortId == 1) {
 			urlStr = "PhimLeController/GetListPhimLe";

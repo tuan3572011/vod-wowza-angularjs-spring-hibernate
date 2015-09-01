@@ -3,6 +3,8 @@ package vn.edu.hcmuaf.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,13 +24,13 @@ import com.vod.model.User;
 @Controller
 @RequestMapping("/CommentController")
 public class CommentController {
+	private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
 
 	@Autowired
 	private LoginServiceImpl userService;
 
 	@RequestMapping(value = "/getByMovieId/{filmId}", method = RequestMethod.GET)
-	public @ResponseBody String doGetCommentByMovieId(
-			@PathVariable("filmId") String filmId) {
+	public @ResponseBody String doGetCommentByMovieId(@PathVariable("filmId") String filmId) {
 		String comments = getByMovieId(filmId);
 		return comments;
 	}
@@ -38,18 +40,16 @@ public class CommentController {
 		params.put("filmId", filmId);
 		RestTemplate restTemplate = new RestTemplate();
 
-		String str = restTemplate.getForObject(LinkService.COMMENT_GETBY_MOVIE,
-				String.class, params);
+		String str = restTemplate.getForObject(LinkService.COMMENT_GETBY_MOVIE, String.class, params);
 
 		return str;
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/Save", method = RequestMethod.POST)
-	public String save(@RequestParam("email") String userEmail,
-			@RequestParam("comment") String commentContent,
+	public String save(@RequestParam("email") String userEmail, @RequestParam("comment") String commentContent,
 			@RequestParam("movieId") String movieId) {
-		System.out.println("mv id " + movieId);
+		logger.info("mv id " + movieId);
 		User user = userService.getUser(userEmail);
 		Comment comment = new Comment();
 		comment.setContent(commentContent);
@@ -70,8 +70,8 @@ public class CommentController {
 		params.put("movieId", movieId);
 		RestTemplate restTemplate = new RestTemplate();
 
-		movie = restTemplate.getForObject(LinkService.MOVIE_GETBY_ID,
-				Movie.class, params);
+		movie = restTemplate.getForObject(LinkService.MOVIE_GETBY_ID, Movie.class, params);
+		logger.info(movie.getEngName());
 		return movie;
 	}
 }

@@ -22,7 +22,7 @@ var ThemPhimController = function($scope, $http) {
 	updateStarringsJson();
 	$scope.shouldUpdateStarringsJson = function() {
 		if (localStorage.getItem('shouldUpdateStarringsJson')) {
-			alert('update starring');
+			console.log('update starring');
 			updateStarringsJson();
 			localStorage.removeItem('shouldUpdateStarringsJson');
 		}
@@ -38,7 +38,7 @@ var ThemPhimController = function($scope, $http) {
 	updateDirectorsJson();
 	$scope.shouldUpdateDirectorsJson = function() {
 		if (localStorage.getItem('shouldUpdateDirectorsJson')) {
-			alert('update director');
+			console.log('update director');
 			updateDirectorsJson();
 			localStorage.removeItem('shouldUpdateDirectorsJson');
 		}
@@ -74,12 +74,12 @@ var ThemPhimController = function($scope, $http) {
 		// + serie.numEpisodes + serie.info);
 
 		$http(req).success(function() {
-			alert("OK");
+			console.log("OK");
 			// if save movieSerie Success, update movie serie list in add
 			// episode
 			$scope.updateMovieSeriesJson();
 		}).error(function(response) {
-			alert(response);
+			console.error(response);
 		});
 	};
 
@@ -91,12 +91,12 @@ var ThemPhimController = function($scope, $http) {
 		movie.movie.trailer = sessionStorage.getItem("trailer");
 		movie.movie.name = sessionStorage.getItem("name");
 
-		alert("bg");
-		alert("name " + movie.movie.name);
-		alert("key " + movie.movie.movie_key);
-		alert("image " + movie.movie.image);
-		alert("info" + movie.movie.info);
-		alert("trailer" + movie.movie.trailer);
+		console.log("bg");
+		console.log("name " + movie.movie.name);
+		console.log("key " + movie.movie.movie_key);
+		console.log("image " + movie.movie.image);
+		console.log("info" + movie.movie.info);
+		console.log("trailer" + movie.movie.trailer);
 		var req = {
 			method : 'POST',
 			url : 'ThemPhimController/Movie/Save',
@@ -106,9 +106,9 @@ var ThemPhimController = function($scope, $http) {
 			data : movie
 		};
 		$http(req).success(function() {
-			alert("OK");
-		}).error(function() {
-			alert("ERROR");
+			console.log("OK");
+		}).error(function(error) {
+			console.error(error);
 		});
 	};
 
@@ -116,8 +116,8 @@ var ThemPhimController = function($scope, $http) {
 	$scope.addEpisode = function(episode) {
 		episode.episode.movie_key = sessionStorage.getItem("key");
 		episode.episode.name = sessionStorage.getItem("name");
-		alert("ep key " + episode.episode.movie_key);
-		alert("ep name " + episode.episode.name);
+		console.log("ep key " + episode.episode.movie_key);
+		console.log("ep name " + episode.episode.name);
 		var req = {
 			method : 'POST',
 			url : 'ThemPhimController/Episode/Save',
@@ -127,9 +127,9 @@ var ThemPhimController = function($scope, $http) {
 			data : episode
 		};
 		$http(req).success(function() {
-			alert("OK");
-		}).error(function() {
-			alert("ERROR");
+			console.log("OK");
+		}).error(function(error) {
+			console.error(error);
 		});
 	};
 

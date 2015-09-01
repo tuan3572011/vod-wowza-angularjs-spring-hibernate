@@ -3,6 +3,8 @@ package vn.edu.hcmuaf.controller.admin;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,6 +28,7 @@ import com.vod.model.Starring;
 @Controller
 @RequestMapping(value = "/ThemPhimController")
 public class ThemPhimController {
+	private static final Logger logger = LoggerFactory.getLogger(ThemPhimController.class);
 
 	@RequestMapping(value = "/layout")
 	public String getIndexPage(Model model) {
@@ -54,29 +57,28 @@ public class ThemPhimController {
 		model.addAttribute("starrings", starrings);
 		model.addAttribute("message", "nasdfnsfda");
 
-		System.out.println("Them phim layout");
+		logger.info("Them phim layout");
 		return "ThemPhim";
 	}
 
 	@RequestMapping(value = "/Movie/Save", method = RequestMethod.POST, consumes = "application/json")
 	public @ResponseBody void saveMovie(@RequestBody Movie movie) {
-		System.out.println("image " + movie.getImage());
-		System.out.println("name " + movie.getName());
-		System.out.println("key " + movie.getMovie_key());
-		System.out.println("trailer " + movie.getTrailer());
+		logger.info("image " + movie.getImage());
+		logger.info("name " + movie.getName());
+		logger.info("key " + movie.getMovie_key());
+		logger.info("trailer " + movie.getTrailer());
 
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-		ResponseEntity<Void> entity = restTemplate.postForEntity(
-				LinkService.MOVIE_ADD, movie, Void.class);
+		ResponseEntity<Void> entity = restTemplate.postForEntity(LinkService.MOVIE_ADD, movie, Void.class);
 		boolean isSaveOk = true;
 		if (entity.getStatusCode().equals(HttpStatus.OK)) {
 			isSaveOk = true;
 		} else {
 			isSaveOk = false;
 		}
-		System.out.println(isSaveOk);
+		logger.info(isSaveOk + "");
 	}
 
 	@RequestMapping(value = "/Episode/Save", method = RequestMethod.POST, consumes = "application/json")
@@ -84,40 +86,35 @@ public class ThemPhimController {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-		ResponseEntity<Void> entity = restTemplate.postForEntity(
-				LinkService.EPISODE_ADD, episode, Void.class);
+		ResponseEntity<Void> entity = restTemplate.postForEntity(LinkService.EPISODE_ADD, episode, Void.class);
 		boolean isSaveOk = true;
 		if (entity.getStatusCode().equals(HttpStatus.OK)) {
 			isSaveOk = true;
 		} else {
 			isSaveOk = false;
 		}
-		System.out.println(isSaveOk);
+		logger.info(isSaveOk + "");
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/MovieSerie/Save", method = RequestMethod.POST)
 	public void saveMovieSerie(@RequestBody MovieSerie serie) {
-		System.out.println("image " + serie.getImage());
-		for (Country ct : serie.getCountries()) {
-			System.out.println(ct.getName() + "--" + ct.getId());
-		}
-		System.out.println(serie.getCountries().size());
-		System.out.println(serie.getInfo());
-		System.out.println("THEM PHIM ");
+		logger.info("image " + serie.getImage());
+		logger.info(serie.getCountries().size() + "");
+		logger.info(serie.getInfo());
+		logger.info("THEM PHIM ");
 
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
-		ResponseEntity<Void> entity = restTemplate.postForEntity(
-				LinkService.SERIE_ADD, serie, Void.class);
+		ResponseEntity<Void> entity = restTemplate.postForEntity(LinkService.SERIE_ADD, serie, Void.class);
 		boolean isSaveOk = true;
 		if (entity.getStatusCode().equals(HttpStatus.OK)) {
 			isSaveOk = true;
 		} else {
 			isSaveOk = false;
 		}
-		System.out.println(isSaveOk);
+		logger.info(isSaveOk + "");
 
 	}
 

@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,7 @@ import com.vod.model.Starring;
 @Controller
 @RequestMapping("/GetJsonController")
 public class GetJsonDataController {
+	private static final Logger logger = LoggerFactory.getLogger(GetJsonDataController.class);
 
 	@ResponseBody
 	@RequestMapping(value = "/Director", method = RequestMethod.POST)
@@ -36,14 +39,12 @@ public class GetJsonDataController {
 
 		ParameterizedTypeReference<List<Director>> responseType = new ParameterizedTypeReference<List<Director>>() {
 		};
-		ResponseEntity<List<Director>> result = restTemplate
-				.exchange(LinkService.DIRECTOR_GETALL, HttpMethod.GET, null,
-						responseType);
+		ResponseEntity<List<Director>> result = restTemplate.exchange(LinkService.DIRECTOR_GETALL, HttpMethod.GET,
+				null, responseType);
 
 		if (result.getStatusCode().equals(HttpStatus.OK)) {
 			directors = result.getBody();
 		}
-
 		return directors;
 
 	}
@@ -57,8 +58,8 @@ public class GetJsonDataController {
 
 		ParameterizedTypeReference<List<Starring>> responseType = new ParameterizedTypeReference<List<Starring>>() {
 		};
-		ResponseEntity<List<Starring>> result = restTemplate.exchange(
-				LinkService.STAR_GETALL, HttpMethod.GET, null, responseType);
+		ResponseEntity<List<Starring>> result = restTemplate.exchange(LinkService.STAR_GETALL, HttpMethod.GET, null,
+				responseType);
 
 		if (result.getStatusCode().equals(HttpStatus.OK)) {
 			starrings = result.getBody();
@@ -81,14 +82,14 @@ public class GetJsonDataController {
 	@ResponseBody
 	@RequestMapping(value = "/MovieSerie", method = RequestMethod.POST)
 	public List<MovieSearch> getAllMovieSerie() {
-		System.out.println("begin get movie serie");
+		logger.info("begin get movie serie");
 		List<MovieSearch> movieSerie = null;
 		RestTemplate restTemplate = new RestTemplate();
 
 		ParameterizedTypeReference<List<MovieSearch>> responseType = new ParameterizedTypeReference<List<MovieSearch>>() {
 		};
-		ResponseEntity<List<MovieSearch>> result = restTemplate.exchange(
-				LinkService.SERIE_GETALL, HttpMethod.GET, null, responseType);
+		ResponseEntity<List<MovieSearch>> result = restTemplate.exchange(LinkService.SERIE_GETALL, HttpMethod.GET,
+				null, responseType);
 
 		if (result.getStatusCode().equals(HttpStatus.OK)) {
 			movieSerie = result.getBody();
@@ -102,8 +103,8 @@ public class GetJsonDataController {
 	}
 
 	private String doRead(String fileName) {
-		String path = ResourcesFolderUtility.getPathFromResourceFolder(
-				UploadController.class, fileName + ".json");
+		logger.info(fileName + ".json");
+		String path = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class, fileName + ".json");
 		StringBuffer stringBuffer = null;
 		BufferedReader reader = null;
 		try {
@@ -129,7 +130,7 @@ public class GetJsonDataController {
 			}
 		}
 
-		System.out.println(stringBuffer.toString());
+		logger.info(stringBuffer.toString());
 		return stringBuffer.toString();
 	}
 

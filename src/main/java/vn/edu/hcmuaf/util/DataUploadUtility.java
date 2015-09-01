@@ -12,6 +12,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import vn.edu.hcmuaf.controller.admin.UploadController;
 
@@ -23,6 +25,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
 public class DataUploadUtility {
+	private static final Logger logger = LoggerFactory.getLogger(DataUploadUtility.class);
 	private static final String VIDEO_DIR_IN_EC2 = "/usr/local/WowzaStreamingEngine/content";
 	private static final String HOME_DIR_IN_EC2 = "/home/ec2-user/";
 	private static final String KEY_DIR_IN_EC2 = "/usr/local/WowzaStreamingEngine/keys/";
@@ -39,11 +42,11 @@ public class DataUploadUtility {
 			// transfer data
 			File localFile = fromStream2File(videoInputStream, "rrr", ".mp4");
 			byte[] buffer = new byte[1500000];
-			System.out.println("begin transfer data scp " + videoName);
+			logger.info("begin transfer data scp " + videoName);
 			isTransferOk = transferDataToEc2UsingScp(session, localFile, videoName, VIDEO_DIR_IN_EC2, buffer);
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return isTransferOk;
 	}
@@ -66,36 +69,36 @@ public class DataUploadUtility {
 			String pathToSaveInServer = HOME_DIR_IN_EC2;
 			boolean isTranferGenKeyCommandFileOk = transferDataToEc2UsingScp(session, localFile, localFile.getName(),
 					pathToSaveInServer, new byte[500]);
-			System.out.println("Transfer key ok " + isTranferGenKeyCommandFileOk);
+			logger.info("Transfer key ok " + isTranferGenKeyCommandFileOk);
 			if (isTranferGenKeyCommandFileOk) {
 				// if upload video is ok, generate key for this video
-				System.out.println("begin genkey");
+				logger.info("begin genkey");
 				generateKeyFileForVideoInEC2(session, videoName);
-				System.out.println("end execute genkey");
+				logger.info("end execute genkey");
 				try {
 					Thread.sleep(2000);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					logger.error(e.getMessage());
 				}
 
 				// read key of this video
 				ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
 				sftpChannel.connect();
 				String keyLocation = KEY_DIR_IN_EC2 + videoName + ".key";
-				System.out.println(keyLocation);
+				logger.info(keyLocation);
 				InputStream inputStream = sftpChannel.get(keyLocation);
 				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 				String keyLine = reader.readLine();
 				while (keyLine.isEmpty()) {
 					keyLine = reader.readLine();
 				}
-				System.out.println(keyLine);
+				logger.info(keyLine);
 				String key = null;
 				// key is delimited by :
 				if (keyLine.split(":").length == 2) {
 					key = keyLine.split(":")[1];
 				}
-				System.out.println("key: " + key);
+				logger.info("key: " + key);
 
 				create480pVideoInEC2(session, videoName);
 				createKeyFileFor480pVideoInEC2(session, videoName);
@@ -106,7 +109,7 @@ public class DataUploadUtility {
 			}
 
 		} catch (JSchException | SftpException | IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		return "";
 	}
@@ -158,7 +161,7 @@ public class DataUploadUtility {
 		command.append(" ");
 		command.append("&");
 		command.append("\n");
-		System.out.println("create 480p video " + command.toString());
+		logger.info("create 480p video " + command.toString());
 		Channel shellChannel = session.openChannel("shell");
 		executeChannel(shellChannel, command.toString());
 	}
@@ -282,7 +285,7 @@ public class DataUploadUtility {
 		command.append(newName);
 		command.append("\n");
 
-		System.out.println("create smil file: " + command.toString());
+		logger.info("create smil file: " + command.toString());
 		executeChannel(shellChannel, command.toString());
 	}
 
@@ -293,7 +296,7 @@ public class DataUploadUtility {
 		try {
 			Thread.sleep(500);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		shellChannel.disconnect();
 	}
@@ -340,8 +343,7 @@ public class DataUploadUtility {
 				bufferedOutput.flush();
 				existSize -= length;
 
-				System.out.println((int) ((double) (fileSize - existSize) / fileSize * 100) + " %");
-				System.out.println(existSize);
+				logger.info((int) ((double) (fileSize - existSize) / fileSize * 100) + " %");
 			}
 			bufferedInput.close();
 			// send '\0'
@@ -350,14 +352,14 @@ public class DataUploadUtility {
 			bufferedOutput.flush();
 
 		} catch (Exception e) {
-			System.out.println(e);
+			logger.error(e.getMessage());
 			return false;
 		} finally {
 			if (bufferedOutput != null) {
 				try {
 					bufferedOutput.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error(e.getMessage());
 				}
 			}
 			if (channel != null) {

@@ -395,7 +395,7 @@ p.wrapBlock {
 							$("#video").remove();
 							var source = '<video width="930" height="500" controls  id="video" class="video-js vjs-default-skin"  >';
 							source = source
-									+ '<source src="http://54.255.233.183:1935/vod-project/Microsoft/playlist.m3u" type="application/x-mpegurl" id="videoSource" /> </video>';
+									+ '<source src="http://54.255.224.27:1935/vod-project/Microsoft/playlist.m3u" type="application/x-mpegurl" id="videoSource" /> </video>';
 							source = source + " ";
 							var videoName = sessionStorage.getItem("source");
 							source = source.replace("Microsoft", videoName);

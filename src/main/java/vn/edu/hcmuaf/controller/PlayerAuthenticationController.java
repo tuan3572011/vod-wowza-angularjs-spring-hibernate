@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,21 +32,21 @@ import com.vod.model.Movie;
 @Controller
 @RequestMapping("/PlayerAuthenticationController")
 public class PlayerAuthenticationController {
+	private static final Logger logger = LoggerFactory.getLogger(PlayerAuthenticationController.class);
 	private static final Map<String, String> sessionID_VideoKey_Map = new HashMap<String, String>();
 
 	@RequestMapping(value = "/layout", method = RequestMethod.GET)
-	public String doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public String doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// }
-		System.out.println("-----------------Layout-------------------");
+		logger.info("-----------------Layout-------------------");
 		return "Player";
 	}
 
 	@RequestMapping
 	public void getKey(HttpServletRequest request, HttpServletResponse response) {
-		System.out.println("-----------------DO GET------------");
+		logger.info("-----------------DO GET------------");
 		String sessionID = request.getSession().getId();
-		System.out.println("SessionID = " + sessionID);
+		logger.info("SessionID = " + sessionID);
 		if (sessionID_VideoKey_Map.containsKey(sessionID)) {
 			String key = sessionID_VideoKey_Map.get(sessionID);
 			if (key != null) {
@@ -52,7 +54,7 @@ public class PlayerAuthenticationController {
 				try {
 					this.tranferKey(key.trim(), response);
 				} catch (IOException e) {
-					e.printStackTrace();
+					logger.error(e.getMessage());
 				}
 			}
 		}
@@ -66,13 +68,12 @@ public class PlayerAuthenticationController {
 
 		RestTemplate restTemplate = new RestTemplate();
 		try {
-			restTemplate.getForObject(LinkService.REGIS_GETBY_EMAIL_IDFILM,
-					Void.class, params);
-			System.out.println("OK");
+			restTemplate.getForObject(LinkService.REGIS_GETBY_EMAIL_IDFILM, Void.class, params);
+			logger.info("OK");
 			check = "OK";
 		} catch (HttpClientErrorException e) {
 			if (e.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-				System.out.println("NOT FOUND");
+				logger.info("NOT FOUND");
 			}
 		}
 		if (check.equals("OK")) {
@@ -87,8 +88,7 @@ public class PlayerAuthenticationController {
 		params.put("epId", movieId);
 		RestTemplate restTemplate = new RestTemplate();
 
-		episode = restTemplate.getForObject(LinkService.EPISODE_GETBY_ID,
-				Episodes.class, params);
+		episode = restTemplate.getForObject(LinkService.EPISODE_GETBY_ID, Episodes.class, params);
 		return episode.getMovie_key();
 	}
 
@@ -98,8 +98,7 @@ public class PlayerAuthenticationController {
 		params.put("movieId", movieId);
 		RestTemplate restTemplate = new RestTemplate();
 
-		movie = restTemplate.getForObject(LinkService.MOVIE_GETBY_ID,
-				Movie.class, params);
+		movie = restTemplate.getForObject(LinkService.MOVIE_GETBY_ID, Movie.class, params);
 		return movie.getMovie_key();
 
 	}
@@ -109,21 +108,19 @@ public class PlayerAuthenticationController {
 	 *      response)
 	 */
 	@RequestMapping(method = RequestMethod.POST)
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String movieId = request.getParameter("movieId");
 		String movieType = request.getParameter("type");
 
-		System.out.println("-----------------DO POST---------");
+		logger.info("-----------------DO POST---------");
 		HttpServletRequest httpRequest = this.getAsHttpRequest(request);
 
 		String authToken = this.extractAuthTokenFromRequest(httpRequest);
-		System.out.println("authToken:" + authToken);
+		logger.info("authToken:" + authToken);
 		String email = TokenUtils.getUserNameFromToken(authToken);
 
 		if (email != null) {
-			boolean isUserRegisterFilm = this
-					.isUserRegisterFilm(email, movieId);
+			boolean isUserRegisterFilm = this.isUserRegisterFilm(email, movieId);
 			if (isUserRegisterFilm) {
 				String key = "";
 				if (movieType.equals("movie")) {
@@ -136,22 +133,20 @@ public class PlayerAuthenticationController {
 			}
 
 		}
-		System.out.println("-----------------END DO POST-----------");
+		logger.info("-----------------END DO POST-----------");
 	}
 
-	private void tranferKey(String keyStr, HttpServletResponse response)
-			throws IOException {
-		System.out.println("Do authentication");
+	private void tranferKey(String keyStr, HttpServletResponse response) throws IOException {
+		logger.info("Do authentication");
 		response.setHeader("Content-Type", "binary/octet-stream");
 		response.setHeader("Pragma", "no-cache");
-		System.out.println("Send secret key " + keyStr + " to client");
+		logger.info("Send secret key " + keyStr + " to client");
 
 		int len = keyStr.length() / 2;
 		byte[] keyBuffer = new byte[len];
 
 		for (int i = 0; i < len; i++)
-			keyBuffer[i] = (byte) Integer.parseInt(
-					keyStr.substring(i * 2, (i * 2) + 2), 16);
+			keyBuffer[i] = (byte) Integer.parseInt(keyStr.substring(i * 2, (i * 2) + 2), 16);
 
 		OutputStream outs = response.getOutputStream();
 		outs.write(keyBuffer);
@@ -173,7 +168,6 @@ public class PlayerAuthenticationController {
 		/* If token not found get it from request parameter */
 		if (authToken == null) {
 			authToken = httpRequest.getParameter("token");
-			System.out.println(authToken);
 		}
 
 		return authToken;

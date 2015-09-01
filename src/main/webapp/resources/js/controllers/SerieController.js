@@ -19,18 +19,17 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 			$scope.episodes = data3;
 			if (data3.length > 0) {
 				firstEpisode = data3[0];
-				alert(firstEpisode);
 			}
 			sessionStorage.setItem("episodes", data3);
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 		FilmUtilityService.getComments(movieId).success(function(data2) {
 			$rootScope.comments = data2;
 			sessionStorage.setItem("comments", data2);
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 		SerieService.getSerie(movieId).success(function(data) {
@@ -46,12 +45,12 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 				if (dataRegis == "OK") {
 
 				}
-			}).error(function() {
-				alert("ERROR");
+			}).error(function(error) {
+				console.error(error);
 			});
 
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 	};
 
@@ -92,8 +91,8 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 			$rootScope.allRelativeMovies = data;
 			// show relative movie
 			$scope.nextRelativeMovies();
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 	};
@@ -122,8 +121,8 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 
 			// show Hot movie
 			$scope.nextHotMovies();
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 
 	};
@@ -157,15 +156,15 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 			sessionStorage.setItem("movieType", "episode");
 			sessionStorage.setItem("serieId", movieId);
 			$location.path('/PlayVideo');
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 	};
 
 	// Check user have bought episode
 	$scope.CheckRegisterEpisode = function(episode) {
 		if ($scope.hasBought == "OK") {
-			alert("Da dang ki ca bo. Xem Phim");
+			console.log("Da dang ki ca bo. Xem Phim");
 			$scope.playMovie(episode);
 		} else {
 			RegisService.checkRegis(episode).success(function(data) {
@@ -175,7 +174,7 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 					$scope.openRegisterDialog(episode);
 				}
 			}).error(function(error) {
-				alert(error);
+				console.error(error);
 			});
 		}
 	};
@@ -197,22 +196,22 @@ var SerieController = function($scope, $rootScope, $http, $location, $modal,
 				RegisService.RegisFilm(film).success(
 						function(data) {
 							if (data == "OK") {
-								alert("Giao dich thanh cong");
+								console.log("Giao dich thanh cong");
 								if (firstEpisode != null
 										|| angular.isDefined(firstEpisode)) {
 									$scope.playMovie(firstEpisode);
 								}
 							} else {
-								alert("Giao dich khong thanh cong");
+								console.log("Giao dich khong thanh cong");
 							}
-						}).error(function() {
-					alert("ERROR");
+						}).error(function(error) {
+					console.error(error);
 				});
 			}, function() {
 
 			});
 		} else {
-			alert("Please login");
+			console.log("Please login");
 			$location.path("/Login");
 		}
 		;
@@ -224,12 +223,12 @@ var ModalInstanceCtrl = function($scope, $modalInstance, film) {
 	$scope.film = film;
 
 	$scope.ok = function() {
-		alert("OK");
+		console.log("OK");
 		$modalInstance.close(film);
 	};
 
 	$scope.cancel = function() {
-		alert("Cancel");
+		console.log("Cancel");
 		$modalInstance.dismiss('cancel');
 	};
 };

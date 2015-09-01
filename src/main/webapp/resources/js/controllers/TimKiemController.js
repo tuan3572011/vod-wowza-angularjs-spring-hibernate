@@ -2,7 +2,7 @@
  * 
  */
 var TimKiemController = function($scope, $http, $location, $rootScope) {
-	
+
 	$scope.SearchFilm = function(dataSearch) {
 		var req = {
 			method : 'GET',
@@ -16,10 +16,9 @@ var TimKiemController = function($scope, $http, $location, $rootScope) {
 			$rootScope.result = data.length;
 			$rootScope.movies = data;
 			$location.path("/TimKiem");
-		}).error(function() {
-			alert("ERROR");
+		}).error(function(error) {
+			console.error(error);
 		});
 	};
-	
-};
 
+};

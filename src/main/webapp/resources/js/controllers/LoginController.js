@@ -48,10 +48,10 @@ var LoginController = function($rootScope, $scope, $http, $location,
 				$rootScope.user = user;
 				$location.path("/PhimBo");
 			}).error(function(response) {
-				alert(response);
+				console.error(response);
 			});
 		}).error(function(response) {
-			alert(response);
+			console.error(response);
 		});
 
 	};
