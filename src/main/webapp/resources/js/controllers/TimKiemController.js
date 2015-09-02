@@ -3,7 +3,7 @@
  */
 var TimKiemController = function($scope, $http, $location, $rootScope) {
 
-	$scope.SearchFilm = function(dataSearch) {
+	$rootScope.SearchFilm = function(dataSearch) {
 		var req = {
 			method : 'GET',
 			url : 'TimKiemController/Search/' + dataSearch,

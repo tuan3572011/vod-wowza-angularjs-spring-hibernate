@@ -31,8 +31,10 @@ public class DataUploadUtility {
 	private static final String KEY_DIR_IN_EC2 = "/usr/local/WowzaStreamingEngine/keys/";
 	private static final String GEN_KEY_FILE = "genkeyWowzaCommand.sh";
 	private static final String XML_HEADER = "\'<?xml version=\"1.0\" encoding=\"UTF-8\"?>\'";
-	private static final String BITRATE_720 = "13500000";
+	private static final String BITRATE_720 = "1350000";
 	private static final String BITRATE_480 = "850000";
+	
+	//http://flash.flowplayer.org/demos/plugins/streaming/bwcheck-smil.html
 
 	public static boolean uploadVideoToWowza(Session session, String videoName, InputStream videoInputStream,
 			InputStream keyInputStream) {
@@ -156,7 +158,7 @@ public class DataUploadUtility {
 		command.append(" ");
 		command.append("ffmpeg -i ");
 		command.append(videoName);
-		command.append(" -vf scale=854:480  -b:v 110k ");
+		command.append(" -vf scale=854:480  -b:v 850k ");
 		command.append(newVideoName);
 		command.append(" ");
 		command.append("&");

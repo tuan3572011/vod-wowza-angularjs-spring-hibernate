@@ -31,5 +31,6 @@
 		</tr>
 	</table>
 
-	<button>Cac phim da tham gia</button>
+	<button ng-click="SearchFilm(starring.name)">Cac phim da
+		tham gia</button>
 </div>

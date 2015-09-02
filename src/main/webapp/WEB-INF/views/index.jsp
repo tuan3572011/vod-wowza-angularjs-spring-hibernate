@@ -287,9 +287,9 @@ body {
 				var max = 0;
 				$
 						.getJSON(
-								'http://localhost:8080/hcmuaf/PhimBoController/jsonsearch',
+								'PhimBoController/jsonsearch',
 								function(data) {
-									var output = '<ul class="suggestsearch cf" ng-controller="FilmRedirectController">';
+									var output = '<ul class="suggestsearch cf">';
 									$
 											.each(
 													data,
