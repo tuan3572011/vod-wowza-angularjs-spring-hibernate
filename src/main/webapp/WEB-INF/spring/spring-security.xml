@@ -13,10 +13,8 @@
 			after="FORM_LOGIN_FILTER" />
 		<!-- <intercept-url pattern="/PhimBoController/layout" access="hasRole('ROLE_ADMIN')" 
 			/> -->
-		<intercept-url pattern="/PhimLeController/layout"
-			access="hasRole('ROLE_USER')" />
-		<intercept-url pattern="/ChiTietController/layout"
-			access="hasRole('ROLE_USER')" />
+		<!-- <intercept-url pattern="/PhimLeController/layout" access="hasRole('ROLE_USER')" 
+			/> -->
 	</http>
 
 	<authentication-manager id="authenticationManager">

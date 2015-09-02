@@ -20,7 +20,7 @@
 				<div class="col-xs-12 col-sm-6 col-lg-3">
 					<div class="form-group">
 						<label><spring:message code="film.Category" /></label> <select
-							ng-change="categoryFilm()" ng-init="category = categoriesS[0]"
+							ng-change="categoryFilm()" ng-init="category = categoriesS[12]"
 							ng-options="category as category.name for category in categoriesS"
 							class="form-control" ng-model="category">
 						</select>
@@ -41,7 +41,7 @@
 				<div class="col-xs-12 col-sm-6 col-lg-3">
 					<div class="form-group">
 						<label><spring:message code="film.Country" /></label> <select
-							ng-change="countryFilm()" ng-init="country = countriesS[0]"
+							ng-change="countryFilm()" ng-init="country = countriesS[12]"
 							ng-options="country as country.name for country in countriesS"
 							class="form-control" ng-model="country">
 						</select>
