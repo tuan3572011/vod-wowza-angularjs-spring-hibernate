@@ -13,7 +13,7 @@ var PhimLeController = function($scope, $http, $location, $rootScope) {
 		name : 'Đánh giá'
 	} ];
 	$scope.publishYears = [ {
-		id : 1,
+		id : 0,
 		name : 'Tất cả'
 	}, {
 		id : 2015,

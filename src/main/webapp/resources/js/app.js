@@ -69,7 +69,7 @@ App
 					});
 
 					$routeProvider.when('/FilmRedirect', {
-						templateUrl : 'ChiTietController/RidirectLayout',
+						templateUrl : 'ChiTietController/RedirectLayout',
 						controller : FilmRedirectController
 					});
 
