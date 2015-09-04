@@ -1,12 +1,17 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<!-- Load video js -->
-<link href="resources/videojs/video-js.css" rel="stylesheet">
 <script src="resources/videojs/video.js"></script>
+<script src="resources/videojs/videojs-hls.js"></script>
+<link href="resources/videojs/video-js.css" rel="stylesheet">
+<script>
+	videojs.options.flash.swf = "resources/videojs/video-js.swf";
+</script>
 <!-- Media Sources plugin -->
 <script src="resources/videojs/videojs-media-sources.js"></script>
+
 <!-- HLS plugin -->
-<script src="resources/videojs/videojs-hls.js"></script>
+
 <!-- segment handling -->
 <script src="resources/videojs/segment/xhr.js"></script>
 <script src="resources/videojs/segment/flv-tag.js"></script>
@@ -25,6 +30,9 @@
 <script src="resources/videojs/segment/decrypter.js"></script>
 
 <script src="resources/videojs/segment/bin-utils.js"></script>
+
+
+
 <style>
 <!--
 label {
@@ -355,11 +363,8 @@ p.wrapBlock {
 	});
 </script>
 <script>
-	videojs.options.flash.swf = "resources/videojs/video-js.swf";
-</script>
-<script>
 	var player;
-	function playVideo() {
+	function playVideo(videoShortType) {
 		$(document)
 				.ready(
 						function() {
@@ -369,39 +374,33 @@ p.wrapBlock {
 							source = source + " ";
 							var videoName = sessionStorage.getItem("source");
 							source = source.replace("Microsoft", videoName);
-							var videoShortType = sessionStorage
-									.getItem("videoShortType");
-							if ((videoShortType == undefined)
-									|| (videoShortType == null)) {
-								videoShortType = ".smil";
-							}
 							source = source.replace(".mp4", videoShortType);
 							$("#containVideo").append(source);
 
-							player = videojs("#video");
+							player = videojs('video');
 						});
 	}
 	function reloadVideo(videoShortType) {
-		$(document).ready(function() {
-			if ((player !== undefined) && (player !== null)) {
-				player.pause();
-				player.dispose();
-			}
-			sessionStorage.setItem("videoShortType", videoShortType);
+		$(document)
+				.ready(
+						function() {
+							if ((player !== undefined) && (player !== null)) {
+								player.dispose();
+								$("#video").remove();
+							}
 
-			/* $("#video").remove();
-			var source = '<video width="930" height="500" controls  id="video" class="video-js vjs-default-skin" preload="none" >';
-			source = source
-					+ '<source src="http://54.255.224.27:1935/vod-project/Microsoft/playlist.m3u"  type="application/x-mpegurl" id="videoSource" /> </video>';
-			source = source + " ";
-			var videoName = sessionStorage.getItem("source");
-			source = source.replace("Microsoft", videoName);
-			source = source.replace(".mp4", videoShortType);
-			$("#containVideo").append(source);
+							var source = '<video width="930" height="500" controls  id="video" class="video-js vjs-default-skin" preload="none" >';
+							source = source
+									+ '<source src="http://54.255.224.27:1935/vod-project/Microsoft/playlist.m3u"  type="application/x-mpegurl" id="videoSource" /> </video>';
+							source = source + " ";
+							var videoName = sessionStorage.getItem("source");
+							source = source.replace("Microsoft", videoName);
+							source = source.replace(".mp4", videoShortType);
+							$("#containVideo").append(source);
 
-			player = videojs('#video'); */
-		});
+							player = videojs('video');
+						});
 	}
-	playVideo();
+	playVideo(".smil");
 </script>
 

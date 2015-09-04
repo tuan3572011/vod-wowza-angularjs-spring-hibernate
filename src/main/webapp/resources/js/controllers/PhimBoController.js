@@ -3,38 +3,6 @@
  */
 var PhimBoController = function($scope, $location, $rootScope, $http) {
 
-	$scope.sorts = [ {
-		id : 1,
-		name : 'Tất cả'
-	}, {
-		id : 2,
-		name : 'Lượt xem'
-	}, {
-		id : 3,
-		name : 'Đánh giá'
-	} ];
-	$scope.publishYears = [ {
-		id : 1,
-		name : 'Tất cả'
-	}, {
-		id : 2015,
-		name : '2015'
-	}, {
-		id : 2014,
-		name : '2014'
-	}, {
-		id : 2013,
-		name : '2013'
-	}, {
-		id : 2012,
-		name : '2012'
-	}, {
-		id : 2011,
-		name : '2011'
-	}, {
-		id : 2010,
-		name : 'Trước 2011'
-	} ];
 	$scope.PhimBo = function() {
 		var req = {
 			method : 'GET',
@@ -123,14 +91,5 @@ var PhimBoController = function($scope, $location, $rootScope, $http) {
 	};
 
 	$scope.readJsonSearch();
-
-	// get category
-	$http.post('GetJsonController/Category').success(function(data) {
-		$scope.categoriesS = data;
-	});
-	// get country
-	$http.post('GetJsonController/Country').success(function(data) {
-		$scope.countriesS = data;
-	});
 
 };

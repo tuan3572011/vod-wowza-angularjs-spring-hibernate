@@ -2,40 +2,13 @@
  * 
  */
 var PhimLeController = function($scope, $http, $location, $rootScope) {
-	$scope.sorts = [ {
-		id : 1,
-		name : 'Tất cả'
-	}, {
-		id : 2,
-		name : 'Lượt xem'
-	}, {
-		id : 3,
-		name : 'Đánh giá'
-	} ];
-	$scope.publishYears = [ {
-		id : 0,
-		name : 'Tất cả'
-	}, {
-		id : 2015,
-		name : '2015'
-	}, {
-		id : 2014,
-		name : '2014'
-	}, {
-		id : 2013,
-		name : '2013'
-	}, {
-		id : 2012,
-		name : '2012'
-	}, {
-		id : 2011,
-		name : '2011'
-	}, {
-		id : 2010,
-		name : 'Trước 2011'
-	} ];
 
-	$scope.PhimLe = function() {
+	$scope.ChiTiet = function(movieId) {
+		sessionStorage.setItem("movieId", movieId);
+		$location.path('/ChiTiet');
+	};
+
+	var PhimLe = function() {
 		var req = {
 			method : 'GET',
 			url : 'PhimLeController/GetListPhimLe',
@@ -49,8 +22,7 @@ var PhimLeController = function($scope, $http, $location, $rootScope) {
 			console.error(error);
 		});
 	};
-
-	$scope.PhimLe();
+	PhimLe();
 
 	$scope.categoryFilm = function() {
 		var cateId = $scope.category.id;
@@ -121,20 +93,6 @@ var PhimLeController = function($scope, $http, $location, $rootScope) {
 		$http(req).success(function(data) {
 			$rootScope.movies = data;
 		});
-	};
-
-	// get category
-	$http.post('GetJsonController/Category').success(function(data) {
-		$scope.categoriesS = data;
-	});
-	// get country
-	$http.post('GetJsonController/Country').success(function(data) {
-		$scope.countriesS = data;
-	});
-
-	$scope.ChiTiet = function(movieId) {
-		sessionStorage.setItem("movieId", movieId);
-		$location.path('/ChiTiet');
 	};
 
 };

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import vn.edu.hcmuaf.initListenner.ConfigServiceAndDBAddress;
 import vn.edu.hcmuaf.util.DataUploadUtility;
 import vn.edu.hcmuaf.util.ResourcesFolderUtility;
 
@@ -31,236 +32,257 @@ import com.jcraft.jsch.UserInfo;
 @Controller
 @RequestMapping("/UploadController")
 public class UploadController {
-	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
-	private String video_upload_secret_key = "";
+    private static final Logger logger = LoggerFactory
+            .getLogger(UploadController.class);
 
-	@RequestMapping("/Image/Layout")
-	public String uploadImageLayout() {
-		return "UploadImage";
-	}
+    private static final String TRAILER_IMAGE_UPLOAD_PATH = ConfigServiceAndDBAddress.imageServerAddress
+            + "/vod-wowza/";
+    private String video_upload_secret_key = "";
 
-	private String randomName() {
-		StringBuilder bd = new StringBuilder();
-		Random rd = new Random();
-		for (int i = 0; i < 5; i++) {
-			bd.append(rd.nextInt(10));
-		}
-		bd.append(System.currentTimeMillis());
-		return bd.toString();
-	}
+    @RequestMapping("/Image/Layout")
+    public String uploadImageLayout() {
+        return "UploadImage";
+    }
 
-	@RequestMapping(value = "/Image/Save", method = RequestMethod.POST)
-	public String doUploadImage(@RequestParam("image") MultipartFile multipart, Map<String, Object> map)
-			throws IOException {
-		logger.info("save image");
-		InputStream inputStream = null;
-		if (!multipart.isEmpty()) {
-			try {
-				inputStream = multipart.getInputStream();
-				String originName = multipart.getOriginalFilename();
-				long length = multipart.getSize();
-				String imageType = originName.substring(originName.length() - 3);
+    private String randomName() {
+        StringBuilder bd = new StringBuilder();
+        Random rd = new Random();
+        for (int i = 0; i < 5; i++) {
+            bd.append(rd.nextInt(10));
+        }
+        bd.append(System.currentTimeMillis());
+        return bd.toString();
+    }
 
-				String contentType = "";
-				if (imageType.equals("png")) {
-					contentType = "image/png";
-				} else if (imageType.equals("jpg")) {
-					contentType = "image/jpeg";
-				} else if (imageType.equals("gif")) {
-					contentType = "image/gif";
-				} else if (imageType.equals("tif")) {
-					contentType = "image/tiff";
-				} else if (imageType.equals("bmp")) {
-					contentType = "image/bmp";
-				} else {
-					map.put("message", "Wrong type");
-					return "upload";
-				}
-				// neu kieu anh ko dung voi anh goc
-				String name = this.randomName() + "." + imageType;
+    @RequestMapping(value = "/Image/Save", method = RequestMethod.POST)
+    public String doUploadImage(@RequestParam("image") MultipartFile multipart,
+            Map<String, Object> map) throws IOException {
+        logger.info("save image");
+        InputStream inputStream = null;
+        if (!multipart.isEmpty()) {
+            try {
+                inputStream = multipart.getInputStream();
+                String originName = multipart.getOriginalFilename();
+                long length = multipart.getSize();
+                String imageType = originName
+                        .substring(originName.length() - 3);
 
-				String folder = "Images";
-				boolean isOK = UploadController.uploadDataToS3(inputStream, folder, name, length, contentType);
-				if (isOK) {
-					String imageUrl = "https://s3-ap-southeast-1.amazonaws.com/vod-wowza/" + folder + "/" + name;
-					map.put("message", imageUrl);
-					logger.info("image location " + imageUrl);
-				} else {
-					map.put("message", "FAIL");
-				}
-			} catch (Exception e) {
-				map.put("message", e.getMessage());
-			}
-		}
+                String contentType = "";
+                if (imageType.equals("png")) {
+                    contentType = "image/png";
+                } else if (imageType.equals("jpg")) {
+                    contentType = "image/jpeg";
+                } else if (imageType.equals("gif")) {
+                    contentType = "image/gif";
+                } else if (imageType.equals("tif")) {
+                    contentType = "image/tiff";
+                } else if (imageType.equals("bmp")) {
+                    contentType = "image/bmp";
+                } else {
+                    map.put("message", "Wrong type");
+                    return "upload";
+                }
+                // neu kieu anh ko dung voi anh goc
+                String name = this.randomName() + "." + imageType;
 
-		return "UploadImage";
-	}
+                String folder = "Images";
+                boolean isOK = UploadController.uploadDataToS3(inputStream,
+                        folder, name, length, contentType);
+                if (isOK) {
+                    String imageUrl = TRAILER_IMAGE_UPLOAD_PATH + folder + "/"
+                            + name;
+                    map.put("message", imageUrl);
+                    logger.info("image location " + imageUrl);
+                } else {
+                    map.put("message", "FAIL");
+                }
+            } catch (Exception e) {
+                map.put("message", e.getMessage());
+            }
+        }
 
-	@RequestMapping("/Trailer/Layout")
-	public String uploadTrailerLayout() {
-		return "UploadTrailer";
-	}
+        return "UploadImage";
+    }
 
-	@RequestMapping(value = "/Trailer/Save", method = RequestMethod.POST)
-	public String doUploadTrailer(@RequestParam("trailer") MultipartFile multipart, Map<String, Object> map)
-			throws IOException {
-		InputStream inputStream = null;
-		if (!multipart.isEmpty()) {
-			try {
-				inputStream = multipart.getInputStream();
-				String originName = multipart.getOriginalFilename();
-				long length = multipart.getSize();
-				String trailerType = originName.substring(originName.length() - 3);
-				String contentType = "application/octet-stream";
-				String name = this.randomName() + "." + trailerType;
-				String folder = "Trailer";
-				logger.info("Upload to S3");
-				boolean isOK = UploadController.uploadDataToS3(inputStream, folder, name, length, contentType);
-				if (isOK) {
-					map.put("message", "https://s3-ap-southeast-1.amazonaws.com/vod-wowza/" + folder + "/" + name);
-				} else {
-					map.put("message", "FAIL");
-				}
-			} catch (Exception e) {
-				map.put("message", e.getMessage());
-			}
-		}
+    @RequestMapping("/Trailer/Layout")
+    public String uploadTrailerLayout() {
+        return "UploadTrailer";
+    }
 
-		return "UploadTrailer";
-	}
+    @RequestMapping(value = "/Trailer/Save", method = RequestMethod.POST)
+    public String doUploadTrailer(
+            @RequestParam("trailer") MultipartFile multipart,
+            Map<String, Object> map) throws IOException {
+        InputStream inputStream = null;
+        if (!multipart.isEmpty()) {
+            try {
+                inputStream = multipart.getInputStream();
+                String originName = multipart.getOriginalFilename();
+                long length = multipart.getSize();
+                String trailerType = originName
+                        .substring(originName.length() - 3);
+                String contentType = "application/octet-stream";
+                String name = this.randomName() + "." + trailerType;
+                String folder = "Trailer";
+                logger.info("Upload to S3");
+                boolean isOK = UploadController.uploadDataToS3(inputStream,
+                        folder, name, length, contentType);
+                if (isOK) {
+                    map.put("message", TRAILER_IMAGE_UPLOAD_PATH + folder + "/"
+                            + name);
+                } else {
+                    map.put("message", "FAIL");
+                }
+            } catch (Exception e) {
+                map.put("message", e.getMessage());
+            }
+        }
 
-	@RequestMapping("/Film/Layout")
-	public String uploadFilmLayout() {
-		return "UploadFilm";
-	}
+        return "UploadTrailer";
+    }
 
-	@RequestMapping(value = "/Film/Save", method = RequestMethod.POST)
-	public String doUploadFilm(@RequestParam("film") MultipartFile multipartFilm, Map<String, Object> map)
-			throws IOException {
-		InputStream videoInputStream = null;
-		InputStream keyInputStream = null;
-		if (!multipartFilm.isEmpty()) {
-			try {
-				// keyInputStream = multipartKey.getInputStream();
-				videoInputStream = multipartFilm.getInputStream();
-				String hostAndUser = "ec2-user@54.255.224.27";
-				// validate video name
-				String videoName = this.randomName() + ".mp4";
-				logger.info("begin upto wowza");
-				boolean isOK = this.uploadDataToWowza(hostAndUser, videoInputStream, videoName, keyInputStream);
-				logger.info("end upto wowza");
-				if (isOK) {
-					map.put("message", videoName);
-					map.put("key", video_upload_secret_key);
-					logger.info(videoName + "--" + video_upload_secret_key);
-				} else {
-					map.put("message", "");
-				}
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				map.put("message", e.getMessage());
-			}
-		}
+    @RequestMapping("/Film/Layout")
+    public String uploadFilmLayout() {
+        return "UploadFilm";
+    }
 
-		return "UploadFilm";
-	}
+    @RequestMapping(value = "/Film/Save", method = RequestMethod.POST)
+    public String doUploadFilm(
+            @RequestParam("film") MultipartFile multipartFilm,
+            Map<String, Object> map) throws IOException {
+        InputStream videoInputStream = null;
+        InputStream keyInputStream = null;
+        if (!multipartFilm.isEmpty()) {
+            try {
+                // keyInputStream = multipartKey.getInputStream();
+                videoInputStream = multipartFilm.getInputStream();
+                String hostAndUser = ConfigServiceAndDBAddress.streamingServerAddress;
+                // validate video name
+                String videoName = this.randomName() + ".mp4";
+                logger.info("begin upto wowza");
+                boolean isOK = this.uploadDataToWowza(hostAndUser,
+                        videoInputStream, videoName, keyInputStream);
+                logger.info("end upto wowza");
+                if (isOK) {
+                    map.put("message", videoName);
+                    map.put("key", video_upload_secret_key);
+                    logger.info(videoName + "--" + video_upload_secret_key);
+                } else {
+                    map.put("message", "");
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                map.put("message", e.getMessage());
+            }
+        }
 
-	private boolean uploadDataToWowza(String hostAndUser, InputStream videoInputStream, String videoName,
-			InputStream keyInputStream) {
+        return "UploadFilm";
+    }
 
-		// get key path
-		String pathToKey = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class, "vod1.pem");
-		logger.info(pathToKey);
-		// open jsch session
-		Session jschSession = null;
-		try {
-			jschSession = getJschSession(pathToKey, hostAndUser);
-			jschSession.connect();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-		}
-		// upload video using this session
-		logger.info(jschSession.getHost() + jschSession.getUserName());
-		DataUploadUtility.uploadVideoToWowza(jschSession, videoName, videoInputStream, keyInputStream);
-		logger.info("end upload video");
-		// generate key and read key from server
-		video_upload_secret_key = DataUploadUtility.generateAndReadVideoKeyFromEc2(jschSession, videoName);
-		// close session
-		jschSession.disconnect();
-		logger.info("session close");
-		if (video_upload_secret_key.isEmpty()) {
-			return false;
-		} else {
-			// jschSession.disconnect();
-			return true;
-		}
-	}
+    private boolean uploadDataToWowza(String hostAndUser,
+            InputStream videoInputStream, String videoName,
+            InputStream keyInputStream) {
 
-	private static boolean uploadDataToS3(InputStream inputStream, String folder, String fileName, long fileLength,
-			String contentType) throws IOException {
-		boolean result = false;
-		String existingBucketName = "vod-wowza";
-		String keyName = folder + "/" + fileName;
+        // get key path
+        String pathToKey = ResourcesFolderUtility.getPathFromResourceFolder(
+                UploadController.class, "vod1.pem");
+        logger.info(pathToKey);
+        // open jsch session
+        Session jschSession = null;
+        try {
+            jschSession = getJschSession(pathToKey, hostAndUser);
+            jschSession.connect();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        // upload video using this session
+        logger.info(jschSession.getHost() + jschSession.getUserName());
+        DataUploadUtility.uploadVideoToWowza(jschSession, videoName,
+                videoInputStream, keyInputStream);
+        logger.info("end upload video");
+        // generate key and read key from server
+        video_upload_secret_key = DataUploadUtility
+                .generateAndReadVideoKeyFromEc2(jschSession, videoName);
+        // close session
+        jschSession.disconnect();
+        logger.info("session close");
+        if (video_upload_secret_key.isEmpty()) {
+            return false;
+        } else {
+            // jschSession.disconnect();
+            return true;
+        }
+    }
 
-		AmazonS3 s3Client = new AmazonS3Client(new PropertiesCredentials(
-				UploadController.class.getResourceAsStream("AwsCredentials.properties")));
+    private static boolean uploadDataToS3(InputStream inputStream,
+            String folder, String fileName, long fileLength, String contentType)
+            throws IOException {
+        boolean result = false;
+        String existingBucketName = "vod-wowza";
+        String keyName = folder + "/" + fileName;
 
-		// s3Client.setEndpoint("autoscaling.ap-southeast-1.amazonaws.com");
-		ObjectMetadata objectMetadata = new ObjectMetadata();
-		objectMetadata.setContentType(contentType);
-		objectMetadata.setContentLength(fileLength);
-		PutObjectRequest putObjectRequest = new PutObjectRequest(existingBucketName, keyName, inputStream,
-				objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead);
-		PutObjectResult result1 = s3Client.putObject(putObjectRequest);
-		inputStream.close();
-		result = true;
-		logger.info("Etag:" + result1.getETag() + "-->" + result);
-		return result;
-	}
+        AmazonS3 s3Client = new AmazonS3Client(new PropertiesCredentials(
+                UploadController.class
+                        .getResourceAsStream("AwsCredentials.properties")));
 
-	private static Session getJschSession(String pathToKey, String hostAndUser) throws JSchException {
-		String[] hostAndUserArr = hostAndUser.split("@");
-		if (hostAndUserArr.length != 2)
-			return null;
-		String user = hostAndUserArr[0];
-		String host = hostAndUserArr[1];
-		int port = 22;
+        // s3Client.setEndpoint("autoscaling.ap-southeast-1.amazonaws.com");
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentType(contentType);
+        objectMetadata.setContentLength(fileLength);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(
+                existingBucketName, keyName, inputStream, objectMetadata)
+                .withCannedAcl(CannedAccessControlList.PublicRead);
+        PutObjectResult result1 = s3Client.putObject(putObjectRequest);
+        inputStream.close();
+        result = true;
+        logger.info("Etag:" + result1.getETag() + "-->" + result);
+        return result;
+    }
 
-		JSch jsch = new JSch();
-		Session session = null;
-		jsch.addIdentity(pathToKey);
-		session = jsch.getSession(user, host, port);
-		session.setUserInfo(new UserInfo() {
-			@Override
-			public void showMessage(String arg0) {
-			}
+    private static Session getJschSession(String pathToKey, String hostAndUser)
+            throws JSchException {
+        String[] hostAndUserArr = hostAndUser.split("@");
+        if (hostAndUserArr.length != 2)
+            return null;
+        String user = hostAndUserArr[0];
+        String host = hostAndUserArr[1];
+        int port = 22;
 
-			@Override
-			public boolean promptYesNo(String arg0) {
-				return true;
-			}
+        JSch jsch = new JSch();
+        Session session = null;
+        jsch.addIdentity(pathToKey);
+        session = jsch.getSession(user, host, port);
+        session.setUserInfo(new UserInfo() {
+            @Override
+            public void showMessage(String arg0) {
+            }
 
-			@Override
-			public boolean promptPassword(String arg0) {
-				return false;
-			}
+            @Override
+            public boolean promptYesNo(String arg0) {
+                return true;
+            }
 
-			@Override
-			public boolean promptPassphrase(String arg0) {
-				return false;
-			}
+            @Override
+            public boolean promptPassword(String arg0) {
+                return false;
+            }
 
-			@Override
-			public String getPassword() {
-				return null;
-			}
+            @Override
+            public boolean promptPassphrase(String arg0) {
+                return false;
+            }
 
-			@Override
-			public String getPassphrase() {
-				return null;
-			}
-		});
-		return session;
-	}
+            @Override
+            public String getPassword() {
+                return null;
+            }
+
+            @Override
+            public String getPassphrase() {
+                return null;
+            }
+        });
+        return session;
+    }
 
 }

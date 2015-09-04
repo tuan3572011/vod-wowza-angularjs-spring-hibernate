@@ -140,58 +140,6 @@ App
 
 				} ]);
 
-App.run(function($rootScope, $location, $cookieStore, $http) {
-
-	/* Reset error when a new view is loaded */
-	$rootScope.$on('$viewContentLoaded', function() {
-		delete $rootScope.error;
-	});
-
-	// get user after user reset because $rootScope.user will be destroy after
-	// refresh page
-	if (!angular.isDefined($rootScope.user)) {
-		var reqUser = {
-			method : 'POST',
-			url : 'LoginController/GetUser'
-		};
-		$http(reqUser).success(function(data) {
-			var user = data;
-			for (var i = 0; i < user.roles.length; i++) {
-				if (user.roles[i].role == "ROLE_USER") {
-					user.isUser = true;
-				}
-				if (user.roles[i].role == "ROLE_ADMIN") {
-					user.isAdmin = true;
-				}
-			}
-			$rootScope.user = user;
-			// $rootScope.email = user.email;
-		});
-	}
-
-	$rootScope.logout = function() {
-		delete $rootScope.user;
-		delete $rootScope.authToken;
-		sessionStorage.removeItem('authToken');
-		window.location.reload(true);
-		$location.path("/Login");
-
-	};
-
-	// $rootScope.hasRole = function(role) {
-	//
-	// if ($rootScope.user === undefined) {
-	// return false;
-	// }
-	//
-	// if ($rootScope.user.roles[role] === undefined) {
-	// return false;
-	// }
-	//
-	// return $rootScope.user.roles[role];
-	// };
-});
-
 App.service('MovieService', [ '$http', function($http) {
 	this.getMovie = function(movieId) {
 		var req = {
@@ -340,3 +288,159 @@ App.service('RegisService', [
 			};
 
 		} ]);
+
+App.run(function($rootScope, $location, $cookieStore, $http) {
+
+	/* Reset error when a new view is loaded */
+	$rootScope.$on('$viewContentLoaded', function() {
+		delete $rootScope.error;
+	});
+
+	// get user after user reset because $rootScope.user will be destroy after
+	// refresh page
+	if (!angular.isDefined($rootScope.user)) {
+		var reqUser = {
+			method : 'POST',
+			url : 'LoginController/GetUser'
+		};
+		$http(reqUser).success(function(data) {
+			var user = data;
+			for (var i = 0; i < user.roles.length; i++) {
+				if (user.roles[i].role == "ROLE_USER") {
+					user.isUser = true;
+				}
+				if (user.roles[i].role == "ROLE_ADMIN") {
+					user.isAdmin = true;
+				}
+			}
+			$rootScope.user = user;
+			// $rootScope.email = user.email;
+		});
+	}
+
+	$rootScope.logout = function() {
+		delete $rootScope.user;
+		delete $rootScope.authToken;
+		sessionStorage.removeItem('authToken');
+		window.location.reload(true);
+		$location.path("/Login");
+
+	};
+
+	$rootScope.categoriesS = [ {
+		"id" : 13,
+		"name" : "Tất cả"
+	}, {
+		"id" : 6,
+		"name" : "Chiến Tranh"
+	}, {
+		"id" : 10,
+		"name" : "Cổ Trang"
+	}, {
+		"id" : 8,
+		"name" : "Gia Đình"
+	}, {
+		"id" : 2,
+		"name" : "Hành Động"
+	}, {
+		"id" : 11,
+		"name" : "Hình Sự"
+	}, {
+		"id" : 4,
+		"name" : "Hoạt Hình"
+	}, {
+		"id" : 7,
+		"name" : "Khoa Học Viễn Tưởng"
+	}, {
+		"id" : 12,
+		"name" : "Kinh Dị"
+	}, {
+		"id" : 5,
+		"name" : "Phiêu Lưu"
+	}, {
+		"id" : 3,
+		"name" : "Tâm Lý"
+	}, {
+		"id" : 1,
+		"name" : "Tình Cảm"
+	}, {
+		"id" : 9,
+		"name" : "Võ Thuật"
+	} ];
+
+	$rootScope.countriesS = [ {
+		"id" : 13,
+		"name" : "Tất cả"
+	}, {
+		"id" : 9,
+		"name" : "Anh"
+	}, {
+		"id" : 4,
+		"name" : "Âu Mỹ"
+	}, {
+		"id" : 12,
+		"name" : "Canada"
+	}, {
+		"id" : 3,
+		"name" : "Hàn Quốc"
+	}, {
+		"id" : 8,
+		"name" : "Hồng Kông"
+	}, {
+		"id" : 2,
+		"name" : "Nhật Bản"
+	}, {
+		"id" : 10,
+		"name" : "Pháp"
+	}, {
+		"id" : 6,
+		"name" : "Thái Lan"
+	}, {
+		"id" : 5,
+		"name" : "Trung Quốc"
+	}, {
+		"id" : 7,
+		"name" : "Úc"
+	}, {
+		"id" : 1,
+		"name" : "Việt Nam"
+	}, {
+		"id" : 11,
+		"name" : "Đài Loan"
+	} ];
+
+	$rootScope.publishYears = [ {
+		"id" : 0,
+		"name" : "Tất cả"
+	}, {
+		"id" : 2015,
+		"name" : "2015"
+	}, {
+		"id" : 2014,
+		"name" : "2014"
+	}, {
+		"id" : 2013,
+		"name" : "2013"
+	}, {
+		"id" : 2012,
+		"name" : "2012"
+	}, {
+		"id" : 2011,
+		"name" : "2011"
+	}, {
+		"id" : 2010,
+		"name" : "Trước 2011"
+	} ];
+
+	$rootScope.sorts = [ {
+		"id" : 0,
+		"name" : "Tất cả"
+	}, {
+		"id" : 2,
+		"name" : "Lượt xem"
+	}, {
+		"id" : 3,
+		"name" : "Lượt xem"
+	} ];
+
+});
