@@ -15,6 +15,13 @@
 		<spring.security.version>3.2.5.RELEASE</spring.security.version>
 	</properties>
 	<dependencies>
+		<!-- JSCh -->
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.52</version>
+		</dependency>
+
 		<!-- Apache Commons FileUpload -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
