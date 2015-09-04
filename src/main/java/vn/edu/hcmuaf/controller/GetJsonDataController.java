@@ -29,123 +29,97 @@ import com.vod.model.Starring;
 @Controller
 @RequestMapping("/GetJsonController")
 public class GetJsonDataController {
-    private static final Logger logger = LoggerFactory
-            .getLogger(GetJsonDataController.class);
+	private static final Logger logger = LoggerFactory.getLogger(GetJsonDataController.class);
 
-    @ResponseBody
-    @RequestMapping(value = "/Director", method = RequestMethod.POST)
-    public List<Director> getAllDirector() {
-        List<Director> directors = null;
-        RestTemplate restTemplate = new RestTemplate();
+	@ResponseBody
+	@RequestMapping(value = "/Director", method = RequestMethod.POST)
+	public List<Director> getAllDirector() {
+		List<Director> directors = null;
+		RestTemplate restTemplate = new RestTemplate();
 
-        ParameterizedTypeReference<List<Director>> responseType = new ParameterizedTypeReference<List<Director>>() {
-        };
-        ResponseEntity<List<Director>> result = restTemplate
-                .exchange(LinkService.DIRECTOR_GETALL, HttpMethod.GET, null,
-                        responseType);
+		ParameterizedTypeReference<List<Director>> responseType = new ParameterizedTypeReference<List<Director>>() {
+		};
+		ResponseEntity<List<Director>> result = restTemplate.exchange(LinkService.DIRECTOR_GETALL, HttpMethod.GET,
+				null, responseType);
 
-        if (result.getStatusCode().equals(HttpStatus.OK)) {
-            directors = result.getBody();
-        }
-        return directors;
+		if (result.getStatusCode().equals(HttpStatus.OK)) {
+			directors = result.getBody();
+		}
+		return directors;
 
-    }
+	}
 
-    @ResponseBody
-    @RequestMapping(value = "/Starring", method = RequestMethod.POST)
-    public List<Starring> getAllStarring() {
+	@ResponseBody
+	@RequestMapping(value = "/Starring", method = RequestMethod.POST)
+	public List<Starring> getAllStarring() {
 
-        List<Starring> starrings = null;
-        RestTemplate restTemplate = new RestTemplate();
+		List<Starring> starrings = null;
+		RestTemplate restTemplate = new RestTemplate();
 
-        ParameterizedTypeReference<List<Starring>> responseType = new ParameterizedTypeReference<List<Starring>>() {
-        };
-        ResponseEntity<List<Starring>> result = restTemplate.exchange(
-                LinkService.STAR_GETALL, HttpMethod.GET, null, responseType);
+		ParameterizedTypeReference<List<Starring>> responseType = new ParameterizedTypeReference<List<Starring>>() {
+		};
+		ResponseEntity<List<Starring>> result = restTemplate.exchange(LinkService.STAR_GETALL, HttpMethod.GET, null,
+				responseType);
 
-        if (result.getStatusCode().equals(HttpStatus.OK)) {
-            starrings = result.getBody();
-        }
-        return starrings;
-    }
+		if (result.getStatusCode().equals(HttpStatus.OK)) {
+			starrings = result.getBody();
+		}
+		return starrings;
+	}
 
-    @ResponseBody
-    @RequestMapping(value = "/Country", method = RequestMethod.POST)
-    public String getAllCountry() {
-        return doRead("countryJson");
-    }
+	@ResponseBody
+	@RequestMapping(value = "/MovieSerie", method = RequestMethod.POST)
+	public List<MovieSearch> getAllMovieSerie() {
+		logger.info("begin get movie serie");
+		List<MovieSearch> movieSerie = null;
+		RestTemplate restTemplate = new RestTemplate();
 
-    @ResponseBody
-    @RequestMapping(value = "/Category", method = RequestMethod.POST)
-    public String getAllCategory() {
-        return doRead("categoryJson");
-    }
-    @ResponseBody
-    @RequestMapping(value = "/Sort", method = RequestMethod.GET)
-    public String getAllSort() {
-        return doRead("sortJson");
-    }
+		ParameterizedTypeReference<List<MovieSearch>> responseType = new ParameterizedTypeReference<List<MovieSearch>>() {
+		};
+		ResponseEntity<List<MovieSearch>> result = restTemplate.exchange(LinkService.SERIE_GETALL, HttpMethod.GET,
+				null, responseType);
 
-    @ResponseBody
-    @RequestMapping(value = "/PublishedYear", method = RequestMethod.POST)
-    public String getAllPublishedYear() {
-        return doRead("publishedYearJson");
-    }
+		if (result.getStatusCode().equals(HttpStatus.OK)) {
+			movieSerie = result.getBody();
+		}
+		return movieSerie;
+	}
 
-    @ResponseBody
-    @RequestMapping(value = "/MovieSerie", method = RequestMethod.POST)
-    public List<MovieSearch> getAllMovieSerie() {
-        logger.info("begin get movie serie");
-        List<MovieSearch> movieSerie = null;
-        RestTemplate restTemplate = new RestTemplate();
+	@RequestMapping(value = "/movieSearch", method = RequestMethod.POST)
+	public String getAllFilm() {
+		return doRead("movieSearch");
+	}
 
-        ParameterizedTypeReference<List<MovieSearch>> responseType = new ParameterizedTypeReference<List<MovieSearch>>() {
-        };
-        ResponseEntity<List<MovieSearch>> result = restTemplate.exchange(
-                LinkService.SERIE_GETALL, HttpMethod.GET, null, responseType);
+	private String doRead(String fileName) {
+		logger.info(fileName + ".json");
+		String path = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class, fileName + ".json");
+		StringBuffer stringBuffer = null;
+		BufferedReader reader = null;
+		try {
+			File file = new File(path);
+			reader = new BufferedReader(new FileReader(file));
+			stringBuffer = new StringBuffer();
+			String line = reader.readLine();
+			while (line != null) {
+				stringBuffer.append(line);
+				stringBuffer.append("\n");
+				line = reader.readLine();
+			}
 
-        if (result.getStatusCode().equals(HttpStatus.OK)) {
-            movieSerie = result.getBody();
-        }
-        return movieSerie;
-    }
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
-    @RequestMapping(value = "/movieSearch", method = RequestMethod.POST)
-    public String getAllFilm() {
-        return doRead("movieSearch");
-    }
-
-    private String doRead(String fileName) {
-        logger.info(fileName + ".json");
-        String path = ResourcesFolderUtility.getPathFromResourceFolder(
-                UploadController.class, fileName + ".json");
-        StringBuffer stringBuffer = null;
-        BufferedReader reader = null;
-        try {
-            File file = new File(path);
-            reader = new BufferedReader(new FileReader(file));
-            stringBuffer = new StringBuffer();
-            String line = reader.readLine();
-            while (line != null) {
-                stringBuffer.append(line);
-                stringBuffer.append("\n");
-                line = reader.readLine();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        logger.info(stringBuffer.toString());
-        return stringBuffer.toString().trim();
-    }
+		logger.info(stringBuffer.toString());
+		return stringBuffer.toString();
+	}
 
 }

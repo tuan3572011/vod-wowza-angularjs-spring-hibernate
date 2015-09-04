@@ -1,8 +1,6 @@
 package vn.edu.hcmuaf.initListenner;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Properties;
 
 import javax.servlet.ServletContextEvent;
@@ -10,6 +8,9 @@ import javax.servlet.ServletContextListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 
 import vn.edu.hcmuaf.controller.PhimLeController;
 
@@ -18,34 +19,56 @@ import vn.edu.hcmuaf.controller.PhimLeController;
  *
  */
 public class ConfigServiceAndDBAddress implements ServletContextListener {
-    public static String streamingServerAddress = "";
-    public static String resfulServerAddress = "";
-    public static String imageServerAddress = "";
+	public static String streamingServerAddress = "";
+	public static String resfulServerAddress = "";
+	public static String imageServerAddress = "";
 
-    private Logger logger = LoggerFactory
-            .getLogger(ConfigServiceAndDBAddress.class);
+	private Logger logger = LoggerFactory.getLogger(ConfigServiceAndDBAddress.class);
 
-    @Override
-    public void contextInitialized(ServletContextEvent arg0) {
-        try {
-            Properties properties = new Properties();
-            System.out.println(properties);
-            properties.load(PhimLeController.class
-                    .getResourceAsStream("/serverAddressConfig.properties"));
-            streamingServerAddress = properties
-                    .getProperty("StreamingServerAddress");
-            resfulServerAddress = properties.getProperty("ResfulServerAddress");
-            imageServerAddress = properties.getProperty("ImageServerAddress");
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
+	 * ServletContextEvent)
+	 */
+	@Override
+	public void contextDestroyed(ServletContextEvent arg0) {
+		// TODO Auto-generated method stub
 
-            logger.info("IP ADDRESS OF ALL SERVER"+streamingServerAddress + resfulServerAddress
-                    + imageServerAddress);
+	}
 
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-    @Override
-    public void contextDestroyed(ServletContextEvent arg0) {
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * javax.servlet.ServletContextListener#contextInitialized(javax.servlet
+	 * .ServletContextEvent)
+	 */
+	@Override
+	public void contextInitialized(ServletContextEvent arg0) {
+		// TODO Auto-generated method stub
+		System.out.println("asdfsdf");
+		System.out.println("asdfsdf");
+		System.out.println("asdfsdf");
+		System.out.println("asdfsdf");
+		System.out.println("asdfsdf");
+		System.out.println("asdfsdf");
+		System.out.println("asdfsdf");
+
+		Properties properties = new Properties();
+		try {
+			properties.load(PhimLeController.class.getResourceAsStream("/serverAddressConfig.properties"));
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+		}
+		streamingServerAddress = properties.getProperty("StreamingServerAddress");
+		resfulServerAddress = properties.getProperty("ResfulServerAddress");
+		imageServerAddress = properties.getProperty("ImageServerAddress");
+
+		System.out.println("IP ADDRESS OF ALL SERVER" + streamingServerAddress + resfulServerAddress
+				+ imageServerAddress);
+		logger.info("IP ADDRESS OF ALL SERVER" + streamingServerAddress + resfulServerAddress + imageServerAddress);
+
+	}
 
 }

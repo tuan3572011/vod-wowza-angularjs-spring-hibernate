@@ -22,15 +22,15 @@ var CaNhanController = function($scope, $http, $rootScope, $route) {
 			},
 		};
 		$http(req).success(function(data) {
-			console.log(data);
-			// window.location.reload(true);
+			alert(data);
+//			window.location.reload(true);
 		});
 	};
 
 	$scope.getListRegister = function(email) {
 		var req = {
 			method : 'GET',
-			url : 'RegisFilmController/getListRegister/' + email + '/user',
+			url : 'CaNhanController/history/' + email + '/regis',
 			headers : {
 				"Content-Type" : "application/json"
 			},

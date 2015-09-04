@@ -38,7 +38,7 @@
 										<a href='{{movie.trailer}}' data-toggle="lightbox"
 											data-gallery="youtubevideos" class="btn btn-success">
 											Trailer</a><a class="btn btn-info"
-											data-ng-click="Redirect('{{movie.id}},{{movie.type}}')">Chi
+											data-ng-click="Redirect(movie.id,movie.type)">Chi
 											tiết</a>
 									</footer>
 									<!-- /.modal-content -->
@@ -48,16 +48,20 @@
 										class="badge bad-fix">IMDb: </span> <span
 										class="badge bad-fix bad-fix2">{{movie.publishedYear }}</span>
 								</div>
+								<script type="text/javascript">
+									$('.fix').hover(
+											function() {
+												$(this).find('.caption')
+														.slideDown(250); // .fadeIn(250)
+											},
+											function() {
+												$(this).find('.caption')
+														.slideUp(250); // .fadeOut(205)
+											});
+								</script>
 							</div>
 						</div>
 					</div>
-					<script type="text/javascript">
-						$('.fix').hover(function() {
-							$(this).find('.caption').slideDown(250); // .fadeIn(250)
-						}, function() {
-							$(this).find('.caption').slideUp(250); // .fadeOut(205)
-						});
-					</script>
 					<div style="padding-left: 30%;">
 						<form>
 							<input type="submit" name="home" value="&lt;&lt;"

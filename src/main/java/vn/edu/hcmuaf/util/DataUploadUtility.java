@@ -33,8 +33,8 @@ public class DataUploadUtility {
 	private static final String XML_HEADER = "\'<?xml version=\"1.0\" encoding=\"UTF-8\"?>\'";
 	private static final String BITRATE_720 = "1350000";
 	private static final String BITRATE_480 = "850000";
-	
-	//http://flash.flowplayer.org/demos/plugins/streaming/bwcheck-smil.html
+
+	// http://flash.flowplayer.org/demos/plugins/streaming/bwcheck-smil.html
 
 	public static boolean uploadVideoToWowza(Session session, String videoName, InputStream videoInputStream,
 			InputStream keyInputStream) {

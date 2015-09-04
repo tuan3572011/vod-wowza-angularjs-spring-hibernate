@@ -288,7 +288,6 @@ App.service('RegisService', [
 			};
 
 		} ]);
-
 App.run(function($rootScope, $location, $cookieStore, $http) {
 
 	/* Reset error when a new view is loaded */
@@ -442,5 +441,4 @@ App.run(function($rootScope, $location, $cookieStore, $http) {
 		"id" : 3,
 		"name" : "Lượt xem"
 	} ];
-
 });

@@ -274,7 +274,7 @@ body {
 			} else {
 				sessionStorage.setItem("phimBoId", movieId);
 			}
-			window.location.pathname = "/hcmuaf/#/FilmRedirect";
+			window.location.pathname = "./FilmRedirect";
 		}
 	</script>
 	<script type="text/javascript">

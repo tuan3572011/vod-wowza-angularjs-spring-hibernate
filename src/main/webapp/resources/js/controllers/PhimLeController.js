@@ -3,12 +3,7 @@
  */
 var PhimLeController = function($scope, $http, $location, $rootScope) {
 
-	$scope.ChiTiet = function(movieId) {
-		sessionStorage.setItem("movieId", movieId);
-		$location.path('/ChiTiet');
-	};
-
-	var PhimLe = function() {
+	$scope.PhimLe = function() {
 		var req = {
 			method : 'GET',
 			url : 'PhimLeController/GetListPhimLe',
@@ -22,7 +17,8 @@ var PhimLeController = function($scope, $http, $location, $rootScope) {
 			console.error(error);
 		});
 	};
-	PhimLe();
+
+	$scope.PhimLe();
 
 	$scope.categoryFilm = function() {
 		var cateId = $scope.category.id;
@@ -81,7 +77,7 @@ var PhimLeController = function($scope, $http, $location, $rootScope) {
 		if (year == 1) {
 			urlStr = "PhimLeController/GetListPhimLe";
 		} else {
-			urlStr = "PhimLeController//movie/getByYear/" + year;
+			urlStr = "PhimLeController/movie/getByYear/" + year;
 		}
 		var req = {
 			method : 'GET',
@@ -93,6 +89,11 @@ var PhimLeController = function($scope, $http, $location, $rootScope) {
 		$http(req).success(function(data) {
 			$rootScope.movies = data;
 		});
+	};
+
+	$scope.ChiTiet = function(movieId) {
+		sessionStorage.setItem("movieId", movieId);
+		$location.path('/ChiTiet');
 	};
 
 };

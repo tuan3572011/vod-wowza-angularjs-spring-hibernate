@@ -22,6 +22,11 @@ public class ChiTietController {
 		return "seriedetail";
 	}
 
+	@RequestMapping("/RedirectLayout")
+	public String redirect() {
+		return "RedirectPage";
+	}
+
 	/*
 	 * private List<MovieSearch> topIMDB() { List<MovieSearch> movies = null;
 	 * RestTemplate restTemplate = new RestTemplate();
