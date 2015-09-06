@@ -46,14 +46,6 @@ public class ConfigServiceAndDBAddress implements ServletContextListener {
 	 */
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
-		System.out.println("asdfsdf");
-		System.out.println("asdfsdf");
-		System.out.println("asdfsdf");
-		System.out.println("asdfsdf");
-		System.out.println("asdfsdf");
-		System.out.println("asdfsdf");
-		System.out.println("asdfsdf");
 
 		Properties properties = new Properties();
 		try {
@@ -61,9 +53,9 @@ public class ConfigServiceAndDBAddress implements ServletContextListener {
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
-		streamingServerAddress = properties.getProperty("StreamingServerAddress");
-		resfulServerAddress = properties.getProperty("ResfulServerAddress");
-		imageServerAddress = properties.getProperty("ImageServerAddress");
+		streamingServerAddress = properties.getProperty("StreamingServerAddress").trim();
+		resfulServerAddress = properties.getProperty("ResfulServerAddress").trim();
+		imageServerAddress = properties.getProperty("ImageServerAddress").trim();
 
 		System.out.println("IP ADDRESS OF ALL SERVER" + streamingServerAddress + resfulServerAddress
 				+ imageServerAddress);

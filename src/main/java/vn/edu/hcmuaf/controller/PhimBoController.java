@@ -46,53 +46,45 @@ public class PhimBoController {
 		return result;
 	}
 
-	@RequestMapping(value = "/GetListSerie", method = RequestMethod.GET)
-	private @ResponseBody List<MovieSearch> getListMovie() {
-		List<MovieSearch> movies = null;
+	@RequestMapping(value = "/FilterBy/{orderId}/{categoryId}/{publishYear}/{countryId}/{page}", method = RequestMethod.GET)
+	public @ResponseBody String doFilter(@PathVariable("publishYear") String year,
+			@PathVariable("orderId") String orderId, @PathVariable("categoryId") String categoryId,
+			@PathVariable("countryId") String countryId, @PathVariable("page") String page) {
+
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("categoryId", categoryId);
+		params.put("orderId", orderId);
+		params.put("publishYear", year);
+		params.put("countryId", countryId);
+		params.put("page", page);
+
 		RestTemplate restTemplate = new RestTemplate();
-		ParameterizedTypeReference<List<MovieSearch>> responseType = new ParameterizedTypeReference<List<MovieSearch>>() {
-		};
-		ResponseEntity<List<MovieSearch>> result = restTemplate.exchange(LinkService.SERIE_GETALL, HttpMethod.GET,
-				null, responseType);
-		if (result.getStatusCode().equals(HttpStatus.OK)) {
-			movies = result.getBody();
+
+		String str = restTemplate.getForObject(LinkService.SERIE_FILTER, String.class, params);
+
+		return str;
+	}
+
+	@RequestMapping(value = "/GetTotalFilterPage/{orderId}/{categoryId}/{publishYear}/{countryId}/{page}", method = RequestMethod.GET)
+	public @ResponseBody Integer getTotalFilterPage(@PathVariable("publishYear") String year,
+			@PathVariable("orderId") String orderId, @PathVariable("categoryId") String categoryId,
+			@PathVariable("countryId") String countryId, @PathVariable("page") String page) {
+
+		try {
+			Integer.parseInt(page);
+		} catch (NumberFormatException ex) {
+			page = "1";
 		}
 
-		return movies;
-	}
-
-	@RequestMapping(value = "/serie/getByYear/{year}", method = RequestMethod.GET)
-	public @ResponseBody String doGetByYear(@PathVariable("year") String year) {
-
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("year", year);
-		RestTemplate restTemplate = new RestTemplate();
-
-		String str = restTemplate.getForObject(LinkService.SERIE_GETBY_YEAR, String.class, params);
-
-		return str;
-	}
-
-	@RequestMapping(value = "/serie/getByCountry/{countryId}", method = RequestMethod.GET)
-	public @ResponseBody String doGetByCountry(@PathVariable("countryId") String countryId) {
-
-		Map<String, String> params = new HashMap<String, String>();
+		params.put("categoryId", categoryId);
+		params.put("orderId", orderId);
+		params.put("publishYear", year);
 		params.put("countryId", countryId);
+		params.put("page", page);
+
 		RestTemplate restTemplate = new RestTemplate();
-
-		String str = restTemplate.getForObject(LinkService.SERIE_GETBY_COUNTRY, String.class, params);
-
-		return str;
-	}
-
-	@RequestMapping(value = "/serie/getByCategory/{cateId}", method = RequestMethod.GET)
-	public @ResponseBody String doGetByCategory(@PathVariable("cateId") String cateId) {
-
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("cateId", cateId);
-		RestTemplate restTemplate = new RestTemplate();
-
-		String str = restTemplate.getForObject(LinkService.SERIE_GETBY_CATEGORY, String.class, params);
+		Integer str = restTemplate.getForObject(LinkService.SERIE_FILTER_TOTAL_PAGE, Integer.class, params);
 
 		return str;
 	}

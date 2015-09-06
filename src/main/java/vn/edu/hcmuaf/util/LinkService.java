@@ -17,13 +17,11 @@ public class LinkService {
 
 	// Movie
 	public static final String MOVIE_GETBY_ID = DOMAIN + "/movie/get/{movieId}";
-	public static final String MOVIE_GETALL = DOMAIN + "/movie/all";
 	public static final String MOVIE_ADD = DOMAIN + "/movie/add";
 	public static final String MOVIE_UPDATE = DOMAIN + "/movie/update";
 
 	// Serie
 	public static final String SERIE_GETBY_ID = DOMAIN + "/serie/get/{serieId}";
-	public static final String SERIE_GETALL = DOMAIN + "/serie/all";
 	public static final String SERIE_ADD = DOMAIN + "/serie/add";
 	public static final String DERIE_DELETE = DOMAIN + "/serie/delete/{serieId}";
 	public static final String SERIE_UPDATE = DOMAIN + "/serie/update";
@@ -85,12 +83,6 @@ public class LinkService {
 	public static final String CATE_GETBY_ID = DOMAIN + "/category/get/{cateId}";
 	public static final String CATE_GETALL = DOMAIN + "/category/all";
 
-	// MovieOdd
-	public static final String MOVIEODD_GETALL = DOMAIN + "/movieodd/all";
-	public static final String MOVIEODD_GETBY_VIEW = DOMAIN + "/movieodd/getByView";
-	public static final String MOVIEODD_GETBY_RATE = DOMAIN + "/movieodd/getByRate";
-	public static final String MOVIEODD_GETBY_ID = DOMAIN + "/movieodd/get/{movieId}";
-
 	// http://vodservice-leetrong.rhcloud.com/VOD-ServiceProject/
 
 	// Card
@@ -101,19 +93,15 @@ public class LinkService {
 	public static final String CARD_GETBY_SERI = DOMAIN + "/card/getBySeri/{seri}";
 	public static final String CARD_ADD = DOMAIN + "/card/add/{value}";
 
-	// Additional
 	// MOVIE
-	public static final String MOVIE_GETBY_CATEGORY = DOMAIN + "/movie/getByCategory/{cateId}";
-	public static final String MOVIE_GETBY_COUNTRY = DOMAIN + "/movie/getByCountry/{countryId}";
-	public static final String MOVIE_GETBY_YEAR = DOMAIN + "/movie/getByYear/{year}";
-	public static final String MOVIE_GETBY_VIEW = DOMAIN + "/movie/getByView";
-	public static final String MOVIE_GETBY_RATE = DOMAIN + "/movie/getByRate";
-
+	public static final String MOVIE_FILTER = DOMAIN
+			+ "/movie/getBy/{orderId}/{categoryId}/{publishYear}/{countryId}/{page}";
+	public static final String MOVIE_FILTER_TOTAL_PAGE = DOMAIN
+			+ "/movie/getFilterTotalPage/{orderId}/{categoryId}/{publishYear}/{countryId}/{page}";
 	// SERIE
-	public static final String SERIE_GETBY_CATEGORY = DOMAIN + "/serie/getByCategory/{cateId}";
-	public static final String SERIE_GETBY_COUNTRY = DOMAIN + "/serie/getByCountry/{countryId}";
-	public static final String SERIE_GETBY_YEAR = DOMAIN + "/serie/getByYear/{year}";
-	public static final String SERIE_GETBY_VIEW = DOMAIN + "/serie/getByView";
-	public static final String SERIE_GETBY_RATE = DOMAIN + "/serie/getByRate";
+	public static final String SERIE_FILTER = DOMAIN
+			+ "/serie/getBy/{orderId}/{categoryId}/{publishYear}/{countryId}/{page}";
+	public static final String SERIE_FILTER_TOTAL_PAGE = DOMAIN
+			+ "/serie/getFilterTotalPage/{orderId}/{categoryId}/{publishYear}/{countryId}/{page}";
 
 }

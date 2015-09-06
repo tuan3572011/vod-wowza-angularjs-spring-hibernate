@@ -432,13 +432,10 @@ App.run(function($rootScope, $location, $cookieStore, $http) {
 	} ];
 
 	$rootScope.sorts = [ {
-		"id" : 0,
-		"name" : "Tất cả"
+		"id" : 1,
+		"name" : "Lượt xem"
 	}, {
 		"id" : 2,
-		"name" : "Lượt xem"
-	}, {
-		"id" : 3,
-		"name" : "Lượt xem"
+		"name" : "Đánh giá"
 	} ];
 });
