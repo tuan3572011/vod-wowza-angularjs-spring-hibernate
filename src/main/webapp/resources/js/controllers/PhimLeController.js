@@ -2,7 +2,7 @@
  * 
  */
 var PhimLeController = function($scope, $http, $location, $rootScope) {
-
+	$scope.page = 1;
 	// ---------Load all movie---------------
 	function loadAllMovies() {
 		var req = {

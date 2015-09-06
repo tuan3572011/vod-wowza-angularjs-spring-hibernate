@@ -2,6 +2,7 @@
  * 
  */
 var PhimBoController = function($scope, $location, $rootScope, $http) {
+	$scope.page = 1;
 
 	function loadAllSerieMovies() {
 		var req = {
