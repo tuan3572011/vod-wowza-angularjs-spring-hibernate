@@ -25,6 +25,7 @@ public class LinkService {
 	public static final String SERIE_ADD = DOMAIN + "/serie/add";
 	public static final String DERIE_DELETE = DOMAIN + "/serie/delete/{serieId}";
 	public static final String SERIE_UPDATE = DOMAIN + "/serie/update";
+	public static final String SERIE_GET_ALL = DOMAIN + "/serie/getAll";
 
 	// Episode
 	public static final String EPISODE_GETBY_ID = DOMAIN + "/episode/get/{epId}";

@@ -8,20 +8,18 @@ import javax.servlet.ServletContextListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
 
 import vn.edu.hcmuaf.controller.PhimLeController;
 
 /**
  * Application Lifecycle Listener implementation class ConfigServiceAndDBAddress
- *
+ * 
  */
 public class ConfigServiceAndDBAddress implements ServletContextListener {
 	public static String streamingServerAddress = "";
 	public static String resfulServerAddress = "";
 	public static String imageServerAddress = "";
+	public static String urlGetKey = "";
 
 	private Logger logger = LoggerFactory.getLogger(ConfigServiceAndDBAddress.class);
 
@@ -56,6 +54,7 @@ public class ConfigServiceAndDBAddress implements ServletContextListener {
 		streamingServerAddress = properties.getProperty("StreamingServerAddress").trim();
 		resfulServerAddress = properties.getProperty("ResfulServerAddress").trim();
 		imageServerAddress = properties.getProperty("ImageServerAddress").trim();
+		urlGetKey = properties.getProperty("UrlGetKey").trim();
 
 		System.out.println("IP ADDRESS OF ALL SERVER" + streamingServerAddress + resfulServerAddress
 				+ imageServerAddress);

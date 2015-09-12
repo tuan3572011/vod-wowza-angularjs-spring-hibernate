@@ -19,8 +19,7 @@
 		<form action="${action }" method="POST" enctype="multipart/form-data">
 			<div class="row">
 				<label>Chọn video để upload</label><br> <br> <input
-					id="fileUpload" type="file" name="film"
-					accept="application/octet-stream">
+					id="fileUpload" type="file" name="film">
 			</div>
 			<input type="submit" class="button primary" value="SAVE">
 

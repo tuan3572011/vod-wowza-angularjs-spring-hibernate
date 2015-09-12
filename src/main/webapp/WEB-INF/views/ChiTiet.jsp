@@ -31,7 +31,9 @@ p.wrapBlock {
 				<div class="col-xs-12 col-md-6 col-lg-8">
 					<div style="height: 355px">
 						<p>
-							<button class="btn btn-primary">Trailer</button>
+							<a href='{{movie.trailer }}' data-toggle="lightbox"
+								data-gallery="youtubevideos" class="btn btn-success">
+								Trailer</a>
 							<button ng-if="hasBought == 'FAIL'"
 								data-ng-click="openRegisterDialog(movie)"
 								class="btn btn-primary">Mua</button>
@@ -162,7 +164,8 @@ p.wrapBlock {
 						<label style="font-size: 30px">Phim Liên Quan</label>
 					</legend>
 					<div class="row">
-						<div class="col-lg-2 col2-fix" ng-repeat="movie in relativeMovies">
+						<div class="col-lg-2 col2-fix"
+							ng-repeat="movie in relativeMovies track by movie.id">
 							<div class="image-container"
 								data-ng-click="showMovieDetail(movie.id)">
 								<div class="capt-fix-act2">
@@ -207,7 +210,8 @@ p.wrapBlock {
 						<label style="font-size: 30px">Phim Hot</label>
 					</legend>
 					<div class="row">
-						<div class="col-lg-2 col2-fix" ng-repeat="movie in hotMovies">
+						<div class="col-lg-2 col2-fix"
+							ng-repeat="movie in hotMovies track by movie.id">
 							<div class="image-container">
 								<div class="capt-fix-act2">
 									<div style="cursor: pointer;" class="caption img-detail"

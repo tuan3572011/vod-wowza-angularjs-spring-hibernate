@@ -15,7 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import vn.edu.hcmuaf.controller.admin.UploadController;
+import vn.edu.hcmuaf.initListenner.ConfigServiceAndDBAddress;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -27,12 +27,12 @@ import com.jcraft.jsch.SftpException;
 public class DataUploadUtility {
 	private static final Logger logger = LoggerFactory.getLogger(DataUploadUtility.class);
 	private static final String VIDEO_DIR_IN_EC2 = "/usr/local/WowzaStreamingEngine/content";
-	private static final String HOME_DIR_IN_EC2 = "/home/ec2-user/";
 	private static final String KEY_DIR_IN_EC2 = "/usr/local/WowzaStreamingEngine/keys/";
-	private static final String GEN_KEY_FILE = "genkeyWowzaCommand.sh";
+	private static final String GEN_KEY_FILE = "genkey.sh";
 	private static final String XML_HEADER = "\'<?xml version=\"1.0\" encoding=\"UTF-8\"?>\'";
 	private static final String BITRATE_720 = "1350000";
-	private static final String BITRATE_480 = "850000";
+	private static final String BITRATE_480 = "750000";
+	private static String GET_KEY_ADDRESS = ConfigServiceAndDBAddress.urlGetKey;
 
 	// http://flash.flowplayer.org/demos/plugins/streaming/bwcheck-smil.html
 
@@ -64,83 +64,75 @@ public class DataUploadUtility {
 
 	public static String generateAndReadVideoKeyFromEc2(Session session, String videoName) {
 		try {
-			// upload key
-			String fileUpLoadPath = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class,
-					GEN_KEY_FILE);
-			File localFile = new File(fileUpLoadPath);
-			String pathToSaveInServer = HOME_DIR_IN_EC2;
-			boolean isTranferGenKeyCommandFileOk = transferDataToEc2UsingScp(session, localFile, localFile.getName(),
-					pathToSaveInServer, new byte[500]);
-			logger.info("Transfer key ok " + isTranferGenKeyCommandFileOk);
-			if (isTranferGenKeyCommandFileOk) {
-				// if upload video is ok, generate key for this video
-				logger.info("begin genkey");
-				generateKeyFileForVideoInEC2(session, videoName);
-				logger.info("end execute genkey");
-				try {
-					Thread.sleep(2000);
-				} catch (InterruptedException e) {
-					logger.error(e.getMessage());
-				}
 
-				// read key of this video
-				ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
-				sftpChannel.connect();
-				String keyLocation = KEY_DIR_IN_EC2 + videoName + ".key";
-				logger.info(keyLocation);
-				InputStream inputStream = sftpChannel.get(keyLocation);
-				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-				String keyLine = reader.readLine();
-				while (keyLine.isEmpty()) {
-					keyLine = reader.readLine();
-				}
-				logger.info(keyLine);
-				String key = null;
-				// key is delimited by :
-				if (keyLine.split(":").length == 2) {
-					key = keyLine.split(":")[1];
-				}
-				logger.info("key: " + key);
+			// if upload video is ok, generate key for this video
+			logger.info("begin genkey");
+			generateKeyAndMoveKeyFileToKeyFolderInInEC2(session, videoName);
+			logger.info("end execute genkey");
 
-				create480pVideoInEC2(session, videoName);
-				createKeyFileFor480pVideoInEC2(session, videoName);
-				createSmilFileForVideo(session, videoName);
-				if (key != null) {
-					return key;
-				}
+			logger.info("Begin read key file");
+			// read key of this video
+			ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
+			logger.info("session" + session);
+			sftpChannel.connect();
+			String keyLocation = KEY_DIR_IN_EC2 + videoName + ".key";
+			logger.info(keyLocation);
+			InputStream inputStream = sftpChannel.get(keyLocation);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+			String keyLine = reader.readLine();
+			while (keyLine.isEmpty()) {
+				keyLine = reader.readLine();
 			}
+			sftpChannel.disconnect();
+			logger.info(keyLine);
+			String key = null;
+			// key is delimited by :
+			if (keyLine.split(":").length == 2) {
+				key = keyLine.split(":")[1];
+			}
+			logger.info("key: " + key);
 
+			create480pVideoInEC2(session, videoName);
+			createKeyFileFor480pVideoInEC2(session, videoName);
+			createSmilFileForVideo(session, videoName);
+			if (key != null) {
+				return key;
+			}
 		} catch (JSchException | SftpException | IOException e) {
 			logger.error(e.getMessage());
 		}
 		return "";
 	}
 
-	private static void generateKeyFileForVideoInEC2(Session session, String videoName) throws JSchException,
-			IOException {
+	private static void generateKeyAndMoveKeyFileToKeyFolderInInEC2(Session session, String videoName)
+			throws JSchException, IOException {
 		Channel shellChannel = session.openChannel("shell");
 		StringBuilder command = new StringBuilder();
 		command.append("cd");
 		command.append(" ");
-		command.append(HOME_DIR_IN_EC2);
-		command.append("\n");
-
-		command.append("chmod 777");
+		command.append("/usr/local/WowzaStreamingEngine/bin");
 		command.append(" ");
-		command.append(GEN_KEY_FILE);
-		command.append("\n");
-
-		command.append("nohup");
+		command.append("&&");
 		command.append(" ");
 		command.append("./");
 		command.append(GEN_KEY_FILE);
 		command.append(" ");
+		command.append("ipod");
+		command.append(" ");
 		command.append(videoName);
 		command.append(" ");
-		command.append("&");
+		command.append(GET_KEY_ADDRESS);
+		command.append(" ");
+		command.append("&&");
+		command.append(" ");
+		command.append("mv");
+		command.append(" ");
+		command.append(videoName + ".key");
+		command.append(" ");
+		command.append("/usr/local/WowzaStreamingEngine/keys/");
+		command.append(videoName + ".key");
 		command.append("\n");
-
-		executeChannel(shellChannel, command.toString());
+		executeChannel(shellChannel, command.toString(), 3000);
 	}
 
 	private static void create480pVideoInEC2(Session session, String videoName) throws JSchException, IOException {
@@ -165,7 +157,7 @@ public class DataUploadUtility {
 		command.append("\n");
 		logger.info("create 480p video " + command.toString());
 		Channel shellChannel = session.openChannel("shell");
-		executeChannel(shellChannel, command.toString());
+		executeChannel(shellChannel, command.toString(), 500);
 	}
 
 	private static void createKeyFileFor480pVideoInEC2(Session session, String videoName) throws JSchException,
@@ -195,7 +187,7 @@ public class DataUploadUtility {
 		command.append("&");
 		command.append("\n");
 
-		executeChannel(shellChannel, command.toString());
+		executeChannel(shellChannel, command.toString(), 500);
 	}
 
 	private static void createSmilFileForVideo(Session session, String videoName) throws JSchException, IOException {
@@ -288,15 +280,17 @@ public class DataUploadUtility {
 		command.append("\n");
 
 		logger.info("create smil file: " + command.toString());
-		executeChannel(shellChannel, command.toString());
+		executeChannel(shellChannel, command.toString(), 500);
 	}
 
-	private static void executeChannel(Channel shellChannel, String command) throws JSchException, IOException {
+	private static void executeChannel(Channel shellChannel, String command, long time) throws JSchException,
+			IOException {
+		logger.info(command);
 		shellChannel.setInputStream(IOUtils.toInputStream(command, "UTF-8"));
-		shellChannel.setOutputStream(System.out);
+		// shellChannel.setOutputStream(System.out);
 		shellChannel.connect();
 		try {
-			Thread.sleep(500);
+			Thread.sleep(time);
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage());
 		}
@@ -309,6 +303,7 @@ public class DataUploadUtility {
 		Channel channel = null;
 		try {
 			channel = ss.openChannel("exec");
+
 			StringBuilder command = new StringBuilder();
 			command.append("scp -t");
 			command.append(" ");

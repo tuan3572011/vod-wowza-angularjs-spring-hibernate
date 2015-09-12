@@ -1,7 +1,11 @@
 package vn.edu.hcmuaf.controller.admin;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Random;
 
@@ -13,9 +17,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import vn.edu.hcmuaf.controller.PhimLeController;
 import vn.edu.hcmuaf.initListenner.ConfigServiceAndDBAddress;
 import vn.edu.hcmuaf.util.DataUploadUtility;
-import vn.edu.hcmuaf.util.ResourcesFolderUtility;
 
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.services.s3.AmazonS3;
@@ -34,8 +38,7 @@ import com.jcraft.jsch.UserInfo;
 public class UploadController {
 	private static final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
-	private static final String TRAILER_IMAGE_UPLOAD_PATH = ConfigServiceAndDBAddress.imageServerAddress
-			+ "/vod-wowza/";
+	private static final String TRAILER_IMAGE_UPLOAD_PATH = ConfigServiceAndDBAddress.imageServerAddress;
 	private String video_upload_secret_key = "";
 
 	@RequestMapping("/Image/Layout")
@@ -170,15 +173,16 @@ public class UploadController {
 	}
 
 	private boolean uploadDataToWowza(String hostAndUser, InputStream videoInputStream, String videoName,
-			InputStream keyInputStream) {
+			InputStream keyInputStream) throws URISyntaxException {
 
 		// get key path
-		String pathToKey = ResourcesFolderUtility.getPathFromResourceFolder(UploadController.class, "vod1.pem");
-		logger.info(pathToKey);
 		// open jsch session
 		Session jschSession = null;
+		URL resource = PhimLeController.class.getResource("/vod1.pem");
+		File keyFile = Paths.get(resource.toURI()).toFile();
+
 		try {
-			jschSession = getJschSession(pathToKey, hostAndUser);
+			jschSession = getJschSession(keyFile.getAbsolutePath(), hostAndUser);
 			jschSession.connect();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -200,11 +204,11 @@ public class UploadController {
 		}
 	}
 
-	private static boolean uploadDataToS3(InputStream inputStream, String folder, String fileName, long fileLength,
-			String contentType) throws IOException {
+	private static boolean uploadDataToS3(InputStream inputStream, String folderInBucket, String fileSaveName,
+			long fileLength, String contentType) throws IOException {
 		boolean result = false;
 		String existingBucketName = "vod-wowza";
-		String keyName = folder + "/" + fileName;
+		String keyName = folderInBucket + "/" + fileSaveName;
 
 		AmazonS3 s3Client = new AmazonS3Client(new PropertiesCredentials(
 				UploadController.class.getResourceAsStream("AwsCredentials.properties")));
@@ -230,10 +234,13 @@ public class UploadController {
 		String host = hostAndUserArr[1];
 		int port = 22;
 
+		logger.info("path to key file " + pathToKey);
+
 		JSch jsch = new JSch();
 		Session session = null;
 		jsch.addIdentity(pathToKey);
 		session = jsch.getSession(user, host, port);
+		// session.setPassword("123qweqwe");
 		session.setUserInfo(new UserInfo() {
 			@Override
 			public void showMessage(String arg0) {
@@ -266,5 +273,4 @@ public class UploadController {
 		});
 		return session;
 	}
-
 }

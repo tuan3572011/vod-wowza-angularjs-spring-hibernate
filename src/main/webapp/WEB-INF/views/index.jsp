@@ -274,7 +274,7 @@ body {
 			} else {
 				sessionStorage.setItem("phimBoId", movieId);
 			}
-			window.location.pathname = "./FilmRedirect";
+			window.location.pathname = "Xemphim/#/FilmRedirect";
 		}
 	</script>
 	<script type="text/javascript">
@@ -285,9 +285,7 @@ body {
 				var myExp = new RegExp(searchField, "i");
 				var found = 0;
 				var max = 0;
-				$
-						.getJSON(
-								'PhimBoController/jsonsearch',
+				$.getJSON('PhimBoController/jsonsearch',
 								function(data) {
 									var output = '<ul class="suggestsearch cf">';
 									$

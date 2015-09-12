@@ -29,8 +29,9 @@ public class GetJsonDataController {
 
 		ParameterizedTypeReference<List<Director>> responseType = new ParameterizedTypeReference<List<Director>>() {
 		};
-		ResponseEntity<List<Director>> result = restTemplate.exchange(LinkService.DIRECTOR_GETALL, HttpMethod.GET,
-				null, responseType);
+		ResponseEntity<List<Director>> result = restTemplate
+				.exchange(LinkService.DIRECTOR_GETALL, HttpMethod.GET, null,
+						responseType);
 
 		if (result.getStatusCode().equals(HttpStatus.OK)) {
 			directors = result.getBody();
@@ -48,8 +49,8 @@ public class GetJsonDataController {
 
 		ParameterizedTypeReference<List<Starring>> responseType = new ParameterizedTypeReference<List<Starring>>() {
 		};
-		ResponseEntity<List<Starring>> result = restTemplate.exchange(LinkService.STAR_GETALL, HttpMethod.GET, null,
-				responseType);
+		ResponseEntity<List<Starring>> result = restTemplate.exchange(
+				LinkService.STAR_GETALL, HttpMethod.GET, null, responseType);
 
 		if (result.getStatusCode().equals(HttpStatus.OK)) {
 			starrings = result.getBody();
@@ -57,4 +58,27 @@ public class GetJsonDataController {
 		return starrings;
 	}
 
+	@ResponseBody
+	@RequestMapping(value = "/MovieSerie", method = RequestMethod.GET)
+	public String getAll() {
+		String result = null;
+		RestTemplate restTemplate = new RestTemplate();
+
+		result = restTemplate.getForObject(LinkService.SERIE_GET_ALL,
+				String.class);
+
+		return result;
+		// List<MovieSerie> movieSeries = null;
+		//
+		// ParameterizedTypeReference<List<MovieSerie>> responseType = new
+		// ParameterizedTypeReference<List<MovieSerie>>() {
+		// };
+		// ResponseEntity<List<MovieSerie>> result = restTemplate.exchange(
+		// LinkService.SERIE_GET_ALL, HttpMethod.GET, null, responseType);
+		//
+		// if (result.getStatusCode().equals(HttpStatus.OK)) {
+		// movieSeries = result.getBody();
+		// }
+		// return movieSeries;
+	}
 }
